@@ -1,5 +1,6 @@
 package br.com.maxsueleinstein.stratega.domain.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -12,22 +13,32 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Schema(example = "Conta de energia")
     private String description;
+
+    @Schema(example = "150.50")
     private BigDecimal amount;
     private LocalDateTime date;
 
     @Enumerated(EnumType.STRING)
+    @Schema(example = "EXPENSE")
     private TransactionType type;
 
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
+    @Schema(example = "{\"id\":1}")
     private Wallet wallet;
     @ManyToOne
     private Wallet destinationWallet;
     @ManyToOne
+    @Schema(example = "{\"name\":\"Casa\",\"type\":\"EXPENSE\"}")
     private Category category;
     @ManyToOne
+    @Schema(example = "{\"id\":1}")
     private User user;
+
+    public Transaction() {
+    }
 
     public Transaction(String description, BigDecimal amount, LocalDateTime date, TransactionType type, Wallet wallet, Category category) {
         this.description = description;
