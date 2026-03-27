@@ -4,7 +4,7 @@ import br.com.maxsueleinstein.stratega.domain.dto.CreateUserDTO;
 import br.com.maxsueleinstein.stratega.domain.dto.UserResponseDTO;
 import br.com.maxsueleinstein.stratega.domain.entity.User;
 
-public class UseMapper {
+public class UserMapper {
 
     public static User toEntity(CreateUserDTO dto, String encodedPassword) {
         return new User(
