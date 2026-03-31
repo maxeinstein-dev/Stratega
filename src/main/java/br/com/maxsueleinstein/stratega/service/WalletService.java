@@ -1,10 +1,14 @@
 package br.com.maxsueleinstein.stratega.service;
 
+import br.com.maxsueleinstein.stratega.domain.dto.WalletResponseDTO;
 import br.com.maxsueleinstein.stratega.domain.entity.User;
 import br.com.maxsueleinstein.stratega.domain.entity.Wallet;
+import br.com.maxsueleinstein.stratega.mapper.WalletMapper;
 import br.com.maxsueleinstein.stratega.repository.UserRepository;
 import br.com.maxsueleinstein.stratega.repository.WalletRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class WalletService {
@@ -26,5 +30,10 @@ public class WalletService {
 
         wallet.setUser(user);
         return walletRepository.save(wallet);
+    }
+
+    public List<WalletResponseDTO> findWalletsByUserId(Long userId) {
+        List<Wallet> wallets = walletRepository.findByUserId(userId);
+        return wallets.stream().map(WalletMapper::toResponse).toList();
     }
 }
