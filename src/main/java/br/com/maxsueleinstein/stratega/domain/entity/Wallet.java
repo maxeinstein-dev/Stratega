@@ -15,8 +15,9 @@ public class Wallet {
     @Schema(example = "Carteira Casa")
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Schema(example = "HOUSE")
-    private String type;
+    private WalletType type;
 
     @Schema(example = "0")
     private BigDecimal balance;
@@ -24,11 +25,14 @@ public class Wallet {
     @Schema(example = "{\"id\":1}")
     private User user;
 
+    @Version
+    private Long version;
+
     public Wallet() {
 
     }
 
-    public Wallet(String name, String type, BigDecimal balance, User user) {
+    public Wallet(String name, WalletType type, BigDecimal balance, User user) {
         this.name = name;
         this.type = type;
         this.balance = balance;
@@ -47,11 +51,11 @@ public class Wallet {
         this.name = name;
     }
 
-    public String getType() {
+    public WalletType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(WalletType type) {
         this.type = type;
     }
 
@@ -69,5 +73,13 @@ public class Wallet {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void credit(BigDecimal amount) {
+        this.balance = this.balance.add(amount);
+    }
+
+    public void debit(BigDecimal amount) {
+        this.balance = this.balance.subtract(amount);
     }
 }
