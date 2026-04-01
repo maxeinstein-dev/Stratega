@@ -1,16 +1,15 @@
 package br.com.maxsueleinstein.stratega.service;
 
+import br.com.maxsueleinstein.stratega.domain.dto.TransactionRequestDTO;
+import br.com.maxsueleinstein.stratega.domain.dto.TransactionResponseDTO;
 import br.com.maxsueleinstein.stratega.domain.entity.Category;
 import br.com.maxsueleinstein.stratega.domain.entity.Transaction;
-import br.com.maxsueleinstein.stratega.domain.entity.TransactionType;
 import br.com.maxsueleinstein.stratega.domain.entity.Wallet;
 import br.com.maxsueleinstein.stratega.repository.CategoryRepository;
 import br.com.maxsueleinstein.stratega.repository.TransactionRepository;
 import br.com.maxsueleinstein.stratega.repository.WalletRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class TransactionService {
@@ -26,42 +25,55 @@ public class TransactionService {
     }
 
     @Transactional
-    public Transaction createTransaction(Transaction transaction) {
-        Category category = transaction.getCategory();
-
-        if (category != null) {
-            Optional<Category> existingCategory =
-                    categoryRepository.findByNameAndUserId(category.getName(), transaction.getUser().getId());
-
-            if (existingCategory.isEmpty()) {
-                category = categoryRepository.save(category);
-            } else {
-                category = existingCategory.get();
-            }
-            transaction.setCategory(category);
-        }
-
+    public TransactionResponseDTO createTransaction(TransactionRequestDTO request) {
         Wallet wallet = walletRepository
-                .findById(transaction.getWallet().getId())
+                .findById(request.walletId())
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
 
-        if (transaction.getType() == TransactionType.INCOME) {
-            wallet.credit(transaction.getAmount());
-        }
-        if (transaction.getType() == TransactionType.EXPENSE) {
-            wallet.debit(transaction.getAmount());
-        }
-        if (transaction.getType() == TransactionType.TRANSFER) {
-            Wallet origin = walletRepository.findById(transaction.getWallet().getId())
-                    .orElseThrow(() -> new RuntimeException("Origin wallet not found"));
-            Wallet destination = walletRepository
-                    .findById(transaction.getDestinationWallet().getId())
-                    .orElseThrow(() -> new RuntimeException("Destination wallet not found"));
+        String categoryName = request.categoryName().trim().toUpperCase();
+        String categoryType = request.type().name();
 
-            origin.debit(transaction.getAmount());
-            destination.credit(transaction.getAmount());
+        Category category = categoryRepository
+                .findByNameAndUserId(
+                        categoryName, request.userId())
+                .orElseGet(() -> categoryRepository.save(
+                        new Category(categoryName, categoryType)
+                ));
+
+        Transaction transaction = new Transaction(
+                request.description(),
+                request.amount(),
+                request.date(),
+                request.type(),
+                wallet,
+                category
+        );
+
+        switch (transaction.getType()) {
+            case INCOME -> wallet.credit(transaction.getAmount());
+            case EXPENSE -> wallet.debit(transaction.getAmount());
+            case TRANSFER -> {
+                if (request.destinationWalletId() == null) {
+                    throw new IllegalArgumentException("Destination wallet is required for transfer");
+                }
+                Wallet destination = walletRepository
+                        .findById(request.destinationWalletId())
+                        .orElseThrow(() -> new RuntimeException("Destination wallet not found"));
+
+                wallet.debit(transaction.getAmount());
+                destination.credit(transaction.getAmount());
+            }
         }
-        return transactionRepository.save(transaction);
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        return new TransactionResponseDTO(
+                transaction.getId(),
+                transaction.getDescription(),
+                transaction.getAmount(),
+                transaction.getType(),
+                wallet.getBalance()
+        );
 
     }
 }
