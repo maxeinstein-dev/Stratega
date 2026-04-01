@@ -29,7 +29,7 @@ public class Transaction {
     @Schema(example = "{\"id\":1}")
     private Wallet wallet;
     @ManyToOne
-    private Wallet destinationWallet;
+    private Wallet originWallet;
     @ManyToOne
     @Schema(example = "{\"name\":\"Casa\",\"type\":\"EXPENSE\"}")
     private Category category;
@@ -47,6 +47,14 @@ public class Transaction {
         this.type = type;
         this.wallet = wallet;
         this.category = category;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDescription() {
@@ -89,12 +97,12 @@ public class Transaction {
         this.wallet = wallet;
     }
 
-    public Wallet getDestinationWallet() {
-        return destinationWallet;
+    public Wallet getOriginWallet() {
+        return originWallet;
     }
 
-    public void setDestinationWallet(Wallet destinationWallet) {
-        this.destinationWallet = destinationWallet;
+    public void setOriginWallet(Wallet originWallet) {
+        this.originWallet = originWallet;
     }
 
     public Category getCategory() {
