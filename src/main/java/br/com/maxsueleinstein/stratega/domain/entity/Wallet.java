@@ -16,7 +16,7 @@ public class Wallet {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Schema(example = "HOUSE")
+    @Schema(example = "BANK")
     private WalletType type;
 
     @Schema(example = "0")
