@@ -11,7 +11,7 @@ public record TransactionRequestDTO(Long userId,
                                     LocalDateTime date,
                                     TransactionType type,
                                     Long walletId,
-                                    Long destinationWalletId,
+                                    Long originWalletId,
                                     String categoryName
 ) {
 }
