@@ -53,11 +53,11 @@ public class TransactionService {
             case INCOME -> wallet.credit(transaction.getAmount());
             case EXPENSE -> wallet.debit(transaction.getAmount());
             case TRANSFER -> {
-                if (request.destinationWalletId() == null) {
+                if (request.originWalletId() == null) {
                     throw new IllegalArgumentException("Destination wallet is required for transfer");
                 }
                 Wallet destination = walletRepository
-                        .findById(request.destinationWalletId())
+                        .findById(request.originWalletId())
                         .orElseThrow(() -> new RuntimeException("Destination wallet not found"));
 
                 wallet.debit(transaction.getAmount());
