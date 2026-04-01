@@ -1,8 +1,8 @@
 package br.com.maxsueleinstein.stratega.controller;
 
-import br.com.maxsueleinstein.stratega.domain.entity.Transaction;
+import br.com.maxsueleinstein.stratega.domain.dto.TransactionRequestDTO;
+import br.com.maxsueleinstein.stratega.domain.dto.TransactionResponseDTO;
 import br.com.maxsueleinstein.stratega.service.TransactionService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,9 +17,9 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> createTransactions(@RequestBody Transaction transaction) {
-        Transaction saved = transactionService.createTransaction(transaction);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    public ResponseEntity<TransactionResponseDTO> createTransactions(@RequestBody TransactionRequestDTO transaction) {
+        TransactionResponseDTO response = transactionService.createTransaction(transaction);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
