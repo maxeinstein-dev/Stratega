@@ -2,9 +2,9 @@
 
 Este roadmap considera que as seguintes etapas **já foram concluídas**:
 
--   Base do projeto Spring Boot
--   Entidades criadas
--   Repositories criados
+- Base do projeto Spring Boot
+- Entidades criadas
+- Repositories criados
 
 O foco agora é **implementar a lógica de negócio nos Services e expor
 via Controllers até chegar no MVP funcional.**
@@ -40,11 +40,11 @@ createTransaction()
 
 Responsabilidades:
 
--   verificar se categoria existe
--   criar categoria se não existir
--   associar categoria à transação
--   salvar transação
--   atualizar saldo da carteira
+- verificar se categoria existe
+- criar categoria se não existir
+- associar categoria à transação
+- salvar transação
+- atualizar saldo da carteira
 
 Fluxo:
 
@@ -64,15 +64,15 @@ createTransfer()
 
 Responsabilidades:
 
--   validar carteiras
--   debitar carteira origem
--   creditar carteira destino
--   registrar transaction do tipo TRANSFER
+- validar carteiras
+- debitar carteira origem
+- creditar carteira destino
+- registrar transaction do tipo TRANSFER
 
 Fluxo:
 
 1 Receber originWalletId\
-2 Receber destinationWalletId\
+2 Receber originWalletId\
 3 Receber amount\
 4 Atualizar saldo origem\
 5 Atualizar saldo destino\
@@ -135,7 +135,7 @@ POST /transactions/transfer
 
 Exemplo:
 
-{ "originWalletId": 1, "destinationWalletId": 2, "amount": 500 }
+{ "originWalletId": 1, "originWalletId": 2, "amount": 500 }
 
 Fluxo:
 
@@ -161,9 +161,9 @@ Implementar dentro do TransactionService.
 
 Adicionar validações:
 
--   valor da transação maior que zero
--   carteira deve existir
--   não permitir transferência para mesma carteira
+- valor da transação maior que zero
+- carteira deve existir
+- não permitir transferência para mesma carteira
 
 ------------------------------------------------------------------------
 
@@ -227,9 +227,9 @@ Objetivo inicial:
 
 Backend financeiro funcional capaz de:
 
--   registrar movimentações
--   organizar por carteiras
--   organizar por categorias
--   realizar transferências internas
+- registrar movimentações
+- organizar por carteiras
+- organizar por categorias
+- realizar transferências internas
 
 Esse é o **núcleo do Stratega**.
