@@ -17,12 +17,16 @@ public class TransactionController {
     private final TransferFundsUseCase transferFundsUseCase;
     private final br.com.maxsueleinstein.stratega.application.usecase.FindTransactionsByUserIdUseCase findTransactionsByUserIdUseCase;
 
+    private final br.com.maxsueleinstein.stratega.application.usecase.UpdateTransactionUseCase updateTransactionUseCase;
+
     public TransactionController(CreateTransactionUseCase createTransactionUseCase,
             TransferFundsUseCase transferFundsUseCase,
-            br.com.maxsueleinstein.stratega.application.usecase.FindTransactionsByUserIdUseCase findTransactionsByUserIdUseCase) {
+            br.com.maxsueleinstein.stratega.application.usecase.FindTransactionsByUserIdUseCase findTransactionsByUserIdUseCase,
+            br.com.maxsueleinstein.stratega.application.usecase.UpdateTransactionUseCase updateTransactionUseCase) {
         this.createTransactionUseCase = createTransactionUseCase;
         this.transferFundsUseCase = transferFundsUseCase;
         this.findTransactionsByUserIdUseCase = findTransactionsByUserIdUseCase;
+        this.updateTransactionUseCase = updateTransactionUseCase;
     }
 
     @PostMapping
@@ -45,5 +49,17 @@ public class TransactionController {
 
         java.util.List<TransactionResponse> transactions = findTransactionsByUserIdUseCase.execute(userId);
         return ResponseEntity.ok(transactions);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TransactionResponse> updateTransaction(
+            @PathVariable java.util.UUID id,
+            @RequestBody br.com.maxsueleinstein.stratega.application.dto.UpdateTransactionRequest request) {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+        java.util.UUID requesterId = java.util.UUID.fromString((String) authentication.getPrincipal());
+
+        TransactionResponse response = updateTransactionUseCase.execute(id, requesterId, request);
+        return ResponseEntity.ok(response);
     }
 }

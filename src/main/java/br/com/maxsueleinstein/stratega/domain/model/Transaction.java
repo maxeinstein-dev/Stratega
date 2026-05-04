@@ -15,8 +15,8 @@ public class Transaction {
     private BigDecimal amount;
     private LocalDateTime date;
     private final TransactionType type;
-    private final UUID walletId;
-    private final UUID categoryId;
+    private UUID walletId;
+    private UUID categoryId;
     private final UUID linkedTransactionId; // Used for transfers
 
     public Transaction(UUID id, String description, BigDecimal amount, LocalDateTime date,
@@ -42,17 +42,20 @@ public class Transaction {
         this.linkedTransactionId = linkedTransactionId;
     }
 
-    public void updateDetails(String description, BigDecimal amount, LocalDateTime date, UUID categoryId) {
+    public void updateDetails(String description, BigDecimal amount, LocalDateTime date, UUID categoryId, UUID walletId) {
         validateDescription(description);
         validateAmount(amount);
         validateDate(date);
         
+        if (walletId == null) {
+            throw new IllegalArgumentException("A carteira da transação é obrigatória");
+        }
+
         this.description = description;
         this.amount = amount;
         this.date = date;
-        // O categoryId é final? O requisito original não o marcou como final, vou permitir alteração.
-        // Wait, categoryId is final in the class definition. Let's not allow updating category yet, or I can just drop 'final' from categoryId.
-        // Actually, it's safer to recreate transactions for complex changes, but description, amount, date can change. Let's omit updateDetails for now.
+        this.categoryId = categoryId;
+        this.walletId = walletId;
     }
 
     private void validateDescription(String description) {

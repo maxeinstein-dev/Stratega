@@ -75,4 +75,9 @@ public class UseCaseConfig {
     public br.com.maxsueleinstein.stratega.application.usecase.FindGroupsByUserIdUseCase findGroupsByUserIdUseCase(br.com.maxsueleinstein.stratega.domain.repository.ExpenseGroupRepository repository) {
         return new br.com.maxsueleinstein.stratega.application.usecase.impl.FindGroupsByUserIdUseCaseImpl(repository);
     }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.UpdateTransactionUseCase updateTransactionUseCase(TransactionRepository transactionRepository, WalletRepository walletRepository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.UpdateTransactionUseCaseImpl(transactionRepository, walletRepository);
+    }
 }
