@@ -27,7 +27,7 @@ class GroupBalanceCalculatorTest {
         splits.add(new UniformSplit(alice));
         splits.add(new UniformSplit(bob));
         
-        GroupExpense expense = new GroupExpense(UUID.randomUUID(), "Almoço", new BigDecimal("100.00"), alice, splits, new UniformSplitStrategy());
+        GroupExpense expense = new GroupExpense(UUID.randomUUID(), "Almoço", new BigDecimal("100.00"), alice, java.time.LocalDateTime.now(), splits, new UniformSplitStrategy());
         
         List<GroupExpense> expenses = List.of(expense);
         List<ExpenseGroupMember> members = List.of(alice, bob);
@@ -53,11 +53,11 @@ class GroupBalanceCalculatorTest {
         
         // 1. Alice pagou 90, dividido por Alice, Bob, Charlie (30 cada)
         List<Split> splits1 = List.of(new UniformSplit(alice), new UniformSplit(bob), new UniformSplit(charlie));
-        expenses.add(new GroupExpense(UUID.randomUUID(), "E1", new BigDecimal("90.00"), alice, splits1, new UniformSplitStrategy()));
+        expenses.add(new GroupExpense(UUID.randomUUID(), "E1", new BigDecimal("90.00"), alice, java.time.LocalDateTime.now(), splits1, new UniformSplitStrategy()));
         
         // 2. Bob pagou 60, dividido por Alice, Bob (30 cada)
         List<Split> splits2 = List.of(new UniformSplit(alice), new UniformSplit(bob));
-        expenses.add(new GroupExpense(UUID.randomUUID(), "E2", new BigDecimal("60.00"), bob, splits2, new UniformSplitStrategy()));
+        expenses.add(new GroupExpense(UUID.randomUUID(), "E2", new BigDecimal("60.00"), bob, java.time.LocalDateTime.now(), splits2, new UniformSplitStrategy()));
 
         GroupBalanceCalculator calculator = new GroupBalanceCalculator();
         Map<UUID, BigDecimal> balances = calculator.calculate(members, expenses);

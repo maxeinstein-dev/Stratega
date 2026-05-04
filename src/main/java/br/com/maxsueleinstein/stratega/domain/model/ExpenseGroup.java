@@ -49,4 +49,11 @@ public class ExpenseGroup {
     public void addExpense(GroupExpense expense) {
         this.expenses.add(expense);
     }
+
+    public boolean isUserAllowed(UUID userId) {
+        if (userId == null) return false;
+        if (userId.equals(ownerId)) return true;
+        return members.stream()
+                .anyMatch(m -> userId.equals(m.getUserId()));
+    }
 }

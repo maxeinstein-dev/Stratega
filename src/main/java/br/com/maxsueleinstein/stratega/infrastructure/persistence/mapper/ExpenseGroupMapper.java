@@ -61,7 +61,7 @@ public class ExpenseGroupMapper {
                 })
                 .collect(Collectors.toList());
 
-        return new GroupExpense(entity.getId(), entity.getDescription(), entity.getTotalAmount(), paidBy, splits, strategy);
+        return new GroupExpense(entity.getId(), entity.getDescription(), entity.getTotalAmount(), paidBy, entity.getDate(), splits, strategy);
     }
 
     public static ExpenseGroupEntity toEntity(ExpenseGroup group) {
@@ -92,6 +92,7 @@ public class ExpenseGroupMapper {
         entity.setDescription(expense.getDescription());
         entity.setTotalAmount(expense.getTotalAmount());
         entity.setGroup(groupEntity);
+        entity.setDate(expense.getDate());
         
         // Determinar o tipo de split e o pagador
         String splitType = "UNIFORM";

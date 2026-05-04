@@ -39,6 +39,9 @@ public class GroupExpenseEntity {
     @JoinColumn(name = "group_id", nullable = false)
     private ExpenseGroupEntity group;
 
+    @Column(name = "date_time")
+    private java.time.LocalDateTime date;
+
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupSplitEntity> splits = new ArrayList<>();
 }

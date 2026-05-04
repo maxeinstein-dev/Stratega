@@ -23,9 +23,13 @@ public class CalculateGroupBalancesUseCaseImpl implements CalculateGroupBalances
     }
 
     @Override
-    public GroupBalancesResponse execute(UUID groupId) {
+    public GroupBalancesResponse execute(UUID groupId, UUID requesterId) {
         ExpenseGroup group = repository.findById(groupId)
-                .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
+                .orElseThrow(() -> new br.com.maxsueleinstein.stratega.presentation.exception.ResourceNotFoundException("Grupo não encontrado"));
+
+        if (!group.isUserAllowed(requesterId)) {
+            throw new br.com.maxsueleinstein.stratega.presentation.exception.ForbiddenException("Usuário não tem permissão para ver os saldos deste grupo");
+        }
 
         Map<UUID, BigDecimal> balances = calculator.calculate(group.getMembers(), group.getExpenses());
         List<SuggestedTransfer> transfers = calculator.suggestTransfers(group.getMembers(), balances);

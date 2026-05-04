@@ -24,7 +24,11 @@ public class AddGroupExpenseUseCaseImpl implements AddGroupExpenseUseCase {
     @Override
     public ExpenseGroup execute(AddGroupExpenseRequest request) {
         ExpenseGroup group = repository.findById(request.groupId())
-                .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
+                .orElseThrow(() -> new br.com.maxsueleinstein.stratega.presentation.exception.ResourceNotFoundException("Grupo não encontrado"));
+
+        if (!group.isUserAllowed(request.requesterId())) {
+            throw new br.com.maxsueleinstein.stratega.presentation.exception.ForbiddenException("Usuário não tem permissão para adicionar despesas neste grupo");
+        }
 
         ExpenseGroupMember paidBy = group.getMembers().stream()
                 .filter(m -> m.getId().equals(request.paidByMemberId()))
@@ -63,7 +67,7 @@ public class AddGroupExpenseUseCaseImpl implements AddGroupExpenseUseCase {
             default -> throw new IllegalArgumentException("Tipo de divisão inválido");
         };
 
-        GroupExpense expense = new GroupExpense(null, request.description(), request.amount(), paidBy, splits, strategy);
+        GroupExpense expense = new GroupExpense(null, request.description(), request.amount(), paidBy, request.date(), splits, strategy);
         group.addExpense(expense);
 
         return repository.save(group);

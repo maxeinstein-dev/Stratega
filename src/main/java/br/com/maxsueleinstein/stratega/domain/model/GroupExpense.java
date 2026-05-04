@@ -12,15 +12,19 @@ public class GroupExpense {
     private final String description;
     private final BigDecimal totalAmount;
     private final ExpenseGroupMember paidBy;
+    private final java.time.LocalDateTime date;
     private final List<Split> splits;
 
-    public GroupExpense(UUID id, String description, BigDecimal totalAmount, ExpenseGroupMember paidBy, List<Split> splits, SplitStrategy strategy) {
+    public GroupExpense(UUID id, String description, BigDecimal totalAmount, ExpenseGroupMember paidBy, java.time.LocalDateTime date, List<Split> splits, SplitStrategy strategy) {
         this.id = id != null ? id : UUID.randomUUID();
         this.description = description;
         this.totalAmount = totalAmount;
         this.paidBy = paidBy;
+        this.date = date != null ? date : java.time.LocalDateTime.now();
         this.splits = splits;
-        strategy.calculateSplit(totalAmount, splits);
+        if (strategy != null) {
+            strategy.calculateSplit(totalAmount, splits);
+        }
     }
 
     public UUID getId() {
@@ -37,6 +41,10 @@ public class GroupExpense {
 
     public ExpenseGroupMember getPaidBy() {
         return paidBy;
+    }
+
+    public java.time.LocalDateTime getDate() {
+        return date;
     }
 
     public List<Split> getSplits() {

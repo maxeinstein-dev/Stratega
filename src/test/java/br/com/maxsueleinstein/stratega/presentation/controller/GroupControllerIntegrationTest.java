@@ -38,20 +38,23 @@ class GroupControllerIntegrationTest {
         @MockitoBean
         private JwtTokenProviderPort jwtTokenProviderPort;
 
-        private ObjectMapper objectMapper = new ObjectMapper();
+        private ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 
         @BeforeEach
         void setUp() {
-                this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context).build();
+                this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
+                                .apply(org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity())
+                                .build();
                 // Mock token validation to allow access
                 when(jwtTokenProviderPort.validateToken(anyString())).thenReturn(true);
-                when(jwtTokenProviderPort.getUserIdFromToken(anyString())).thenReturn(UUID.randomUUID().toString());
         }
 
         @Test
         @DisplayName("Deve criar um grupo, adicionar despesa e consultar balanços")
         void shouldCreateGroupAddExpenseAndGetBalances() throws Exception {
                 UUID ownerId = UUID.randomUUID();
+                when(jwtTokenProviderPort.getUserIdFromToken(anyString())).thenReturn(ownerId.toString());
+                
                 CreateGroupRequest createRequest = new CreateGroupRequest("Viagem", ownerId, List.of("Alice", "Bob"));
 
                 // 1. Criar Grupo
@@ -74,7 +77,7 @@ class GroupControllerIntegrationTest {
 
                 // 2. Adicionar Despesa (Alice pagou 100, dividido igualmente)
                 AddGroupExpenseRequest expenseRequest = new AddGroupExpenseRequest(
-                                groupId, "Jantar", new BigDecimal("100.00"), aliceId, "UNIFORM", Map.of());
+                                groupId, ownerId, "Jantar", new BigDecimal("100.00"), aliceId, java.time.LocalDateTime.now(), "UNIFORM", Map.of());
 
                 mockMvc.perform(post("/api/groups/" + groupId + "/expenses")
                                 .header("Authorization", "Bearer dummy-token")
@@ -97,6 +100,8 @@ class GroupControllerIntegrationTest {
         @DisplayName("Deve criar um grupo, adicionar despesa com divisão exata e consultar balanços")
         void shouldCreateGroupWithExactSplit() throws Exception {
                 UUID ownerId = UUID.randomUUID();
+                when(jwtTokenProviderPort.getUserIdFromToken(anyString())).thenReturn(ownerId.toString());
+
                 CreateGroupRequest createRequest = new CreateGroupRequest("Aluguel", ownerId, List.of("Alice", "Bob"));
 
                 String createResponseJson = mockMvc.perform(post("/api/groups")
@@ -117,7 +122,7 @@ class GroupControllerIntegrationTest {
 
                 // 2. Adicionar Despesa Exata (Alice pagou 150, Alice deve 100, Bob deve 50)
                 AddGroupExpenseRequest expenseRequest = new AddGroupExpenseRequest(
-                                groupId, "Aluguel Maio", new BigDecimal("150.00"), aliceId, "EXACT",
+                                groupId, ownerId, "Aluguel Maio", new BigDecimal("150.00"), aliceId, java.time.LocalDateTime.now(), "EXACT",
                                 Map.of(aliceId, "100.00", bobId, "50.00"));
 
                 mockMvc.perform(post("/api/groups/" + groupId + "/expenses")

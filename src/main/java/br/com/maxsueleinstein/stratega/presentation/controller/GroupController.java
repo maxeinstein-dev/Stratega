@@ -52,11 +52,16 @@ public class GroupController {
  
     @PostMapping("/{groupId}/expenses")
     public ResponseEntity<GroupResponse> addExpense(@PathVariable UUID groupId, @RequestBody AddGroupExpenseRequest request) {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        java.util.UUID userId = java.util.UUID.fromString((String) authentication.getPrincipal());
+
         AddGroupExpenseRequest finalRequest = new AddGroupExpenseRequest(
             groupId,
+            userId,
             request.description(),
             request.amount(),
             request.paidByMemberId(),
+            request.date(),
             request.splitType(),
             request.splitValues()
         );
@@ -66,7 +71,10 @@ public class GroupController {
  
     @GetMapping("/{groupId}/balances")
     public ResponseEntity<GroupBalancesResponse> getBalances(@PathVariable UUID groupId) {
-        return ResponseEntity.ok(calculateGroupBalancesUseCase.execute(groupId));
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        java.util.UUID userId = java.util.UUID.fromString((String) authentication.getPrincipal());
+
+        return ResponseEntity.ok(calculateGroupBalancesUseCase.execute(groupId, userId));
     }
  
     private GroupResponse toResponse(ExpenseGroup group) {
