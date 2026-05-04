@@ -30,4 +30,11 @@ public class ExpenseGroupRepositoryAdapter implements ExpenseGroupRepository {
     public Optional<ExpenseGroup> findById(UUID id) {
         return repository.findById(id).map(ExpenseGroupMapper::toDomain);
     }
+
+    @Override
+    public java.util.List<ExpenseGroup> findByUserId(UUID userId) {
+        return repository.findByUserId(userId).stream()
+                .map(ExpenseGroupMapper::toDomain)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

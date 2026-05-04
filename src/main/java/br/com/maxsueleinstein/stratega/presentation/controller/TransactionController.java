@@ -9,37 +9,41 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
 
     private final CreateTransactionUseCase createTransactionUseCase;
     private final TransferFundsUseCase transferFundsUseCase;
+    private final br.com.maxsueleinstein.stratega.application.usecase.FindTransactionsByUserIdUseCase findTransactionsByUserIdUseCase;
 
-    public TransactionController(CreateTransactionUseCase createTransactionUseCase, TransferFundsUseCase transferFundsUseCase) {
+    public TransactionController(CreateTransactionUseCase createTransactionUseCase,
+            TransferFundsUseCase transferFundsUseCase,
+            br.com.maxsueleinstein.stratega.application.usecase.FindTransactionsByUserIdUseCase findTransactionsByUserIdUseCase) {
         this.createTransactionUseCase = createTransactionUseCase;
         this.transferFundsUseCase = transferFundsUseCase;
+        this.findTransactionsByUserIdUseCase = findTransactionsByUserIdUseCase;
     }
 
     @PostMapping
-    public ResponseEntity<TransactionResponse> createTransaction(
-            @RequestHeader("X-User-Id") UUID userId,
-            @RequestBody CreateTransactionRequest request) {
-        
-        // No momento o userId do header é injetado, mas a requisição pode não usar ativamente ainda
-        // a não ser que validássemos se a carteira pertence ao userId logado.
+    public ResponseEntity<TransactionResponse> createTransaction(@RequestBody CreateTransactionRequest request) {
         TransactionResponse response = createTransactionUseCase.execute(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/transfer")
-    public ResponseEntity<Void> transferFunds(
-            @RequestHeader("X-User-Id") UUID userId,
-            @RequestBody TransferFundsRequest request) {
-
+    public ResponseEntity<Void> transferFunds(@RequestBody TransferFundsRequest request) {
         transferFundsUseCase.execute(request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping
+    public ResponseEntity<java.util.List<TransactionResponse>> getTransactions() {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
+                .getContext().getAuthentication();
+        java.util.UUID userId = java.util.UUID.fromString((String) authentication.getPrincipal());
+
+        java.util.List<TransactionResponse> transactions = findTransactionsByUserIdUseCase.execute(userId);
+        return ResponseEntity.ok(transactions);
     }
 }

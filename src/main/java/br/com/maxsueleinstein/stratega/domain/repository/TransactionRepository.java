@@ -9,4 +9,5 @@ public interface TransactionRepository {
     Transaction save(Transaction transaction);
     Optional<Transaction> findById(UUID id);
     List<Transaction> findByWalletId(UUID walletId);
+    List<Transaction> findByUserId(UUID userId);
 }

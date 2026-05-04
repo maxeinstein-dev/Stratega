@@ -22,8 +22,8 @@ import org.springframework.context.annotation.Configuration;
 public class UseCaseConfig {
 
     @Bean
-    public RegisterUserUseCase registerUserUseCase(UserRepository userRepository, PasswordEncoderPort passwordEncoderPort) {
-        return new RegisterUserUseCaseImpl(userRepository, passwordEncoderPort);
+    public RegisterUserUseCase registerUserUseCase(UserRepository userRepository, WalletRepository walletRepository, PasswordEncoderPort passwordEncoderPort) {
+        return new RegisterUserUseCaseImpl(userRepository, walletRepository, passwordEncoderPort);
     }
 
     @Bean
@@ -59,5 +59,20 @@ public class UseCaseConfig {
     @Bean
     public br.com.maxsueleinstein.stratega.application.usecase.CalculateGroupBalancesUseCase calculateGroupBalancesUseCase(br.com.maxsueleinstein.stratega.domain.repository.ExpenseGroupRepository repository) {
         return new br.com.maxsueleinstein.stratega.application.usecase.impl.CalculateGroupBalancesUseCaseImpl(repository);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.FindWalletsByUserIdUseCase findWalletsByUserIdUseCase(WalletRepository walletRepository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.FindWalletsByUserIdUseCaseImpl(walletRepository);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.FindTransactionsByUserIdUseCase findTransactionsByUserIdUseCase(TransactionRepository transactionRepository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.FindTransactionsByUserIdUseCaseImpl(transactionRepository);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.FindGroupsByUserIdUseCase findGroupsByUserIdUseCase(br.com.maxsueleinstein.stratega.domain.repository.ExpenseGroupRepository repository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.FindGroupsByUserIdUseCaseImpl(repository);
     }
 }

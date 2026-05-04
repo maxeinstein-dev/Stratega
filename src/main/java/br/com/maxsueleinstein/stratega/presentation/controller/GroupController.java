@@ -18,21 +18,38 @@ public class GroupController {
     private final CreateGroupUseCase createGroupUseCase;
     private final AddGroupExpenseUseCase addGroupExpenseUseCase;
     private final CalculateGroupBalancesUseCase calculateGroupBalancesUseCase;
-
+    private final br.com.maxsueleinstein.stratega.application.usecase.FindGroupsByUserIdUseCase findGroupsByUserIdUseCase;
+ 
     public GroupController(CreateGroupUseCase createGroupUseCase, 
                            AddGroupExpenseUseCase addGroupExpenseUseCase, 
-                           CalculateGroupBalancesUseCase calculateGroupBalancesUseCase) {
+                           CalculateGroupBalancesUseCase calculateGroupBalancesUseCase,
+                           br.com.maxsueleinstein.stratega.application.usecase.FindGroupsByUserIdUseCase findGroupsByUserIdUseCase) {
         this.createGroupUseCase = createGroupUseCase;
         this.addGroupExpenseUseCase = addGroupExpenseUseCase;
         this.calculateGroupBalancesUseCase = calculateGroupBalancesUseCase;
+        this.findGroupsByUserIdUseCase = findGroupsByUserIdUseCase;
     }
-
+ 
     @PostMapping
     public ResponseEntity<GroupResponse> create(@RequestBody CreateGroupRequest request) {
-        ExpenseGroup group = createGroupUseCase.execute(request);
+        // Automatically set the ownerId to the logged in user if not provided or to enforce security
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        java.util.UUID userId = java.util.UUID.fromString((String) authentication.getPrincipal());
+        
+        CreateGroupRequest finalRequest = new CreateGroupRequest(request.name(), userId, request.memberNames());
+        ExpenseGroup group = createGroupUseCase.execute(finalRequest);
         return ResponseEntity.ok(toResponse(group));
     }
 
+    @GetMapping
+    public ResponseEntity<List<GroupResponse>> getGroups() {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        java.util.UUID userId = java.util.UUID.fromString((String) authentication.getPrincipal());
+        
+        List<GroupResponse> groups = findGroupsByUserIdUseCase.execute(userId);
+        return ResponseEntity.ok(groups);
+    }
+ 
     @PostMapping("/{groupId}/expenses")
     public ResponseEntity<GroupResponse> addExpense(@PathVariable UUID groupId, @RequestBody AddGroupExpenseRequest request) {
         AddGroupExpenseRequest finalRequest = new AddGroupExpenseRequest(
@@ -46,12 +63,12 @@ public class GroupController {
         ExpenseGroup group = addGroupExpenseUseCase.execute(finalRequest);
         return ResponseEntity.ok(toResponse(group));
     }
-
+ 
     @GetMapping("/{groupId}/balances")
     public ResponseEntity<GroupBalancesResponse> getBalances(@PathVariable UUID groupId) {
         return ResponseEntity.ok(calculateGroupBalancesUseCase.execute(groupId));
     }
-
+ 
     private GroupResponse toResponse(ExpenseGroup group) {
         List<MemberResponse> members = group.getMembers().stream()
             .map(m -> new MemberResponse(m.getId(), m.getName(), m.getUserId()))

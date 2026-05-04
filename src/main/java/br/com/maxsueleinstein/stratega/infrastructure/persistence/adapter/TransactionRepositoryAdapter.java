@@ -39,4 +39,11 @@ public class TransactionRepositoryAdapter implements TransactionRepository {
                 .map(TransactionMapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Transaction> findByUserId(UUID userId) {
+        return repository.findByUserId(userId).stream()
+                .map(TransactionMapper::toDomain)
+                .collect(Collectors.toList());
+    }
 }

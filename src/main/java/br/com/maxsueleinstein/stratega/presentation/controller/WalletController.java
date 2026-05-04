@@ -12,14 +12,25 @@ import org.springframework.web.bind.annotation.*;
 public class WalletController {
 
     private final CreateWalletUseCase createWalletUseCase;
-
-    public WalletController(CreateWalletUseCase createWalletUseCase) {
+    private final br.com.maxsueleinstein.stratega.application.usecase.FindWalletsByUserIdUseCase findWalletsByUserIdUseCase;
+ 
+    public WalletController(CreateWalletUseCase createWalletUseCase, br.com.maxsueleinstein.stratega.application.usecase.FindWalletsByUserIdUseCase findWalletsByUserIdUseCase) {
         this.createWalletUseCase = createWalletUseCase;
+        this.findWalletsByUserIdUseCase = findWalletsByUserIdUseCase;
     }
-
+ 
     @PostMapping
     public ResponseEntity<WalletResponse> createWallet(@RequestBody CreateWalletRequest request) {
         WalletResponse response = createWalletUseCase.execute(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+ 
+    @GetMapping
+    public ResponseEntity<java.util.List<WalletResponse>> getWallets() {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        java.util.UUID userId = java.util.UUID.fromString((String) authentication.getPrincipal());
+        
+        java.util.List<WalletResponse> wallets = findWalletsByUserIdUseCase.execute(userId);
+        return ResponseEntity.ok(wallets);
     }
 }
