@@ -1,235 +1,76 @@
-# Stratega --- Backend MVP Roadmap
+# Stratega - Backend MVP & Evolução
 
-Este roadmap considera que as seguintes etapas **já foram concluídas**:
+Este documento consolida o planejamento técnico para o desenvolvimento da API Stratega, unindo o MVP básico com as recomendações de evolução (Diagnóstico Técnico de Nível Sênior).
 
-- Base do projeto Spring Boot
-- Entidades criadas
-- Repositories criados
+---
 
-O foco agora é **implementar a lógica de negócio nos Services e expor
-via Controllers até chegar no MVP funcional.**
+## 🚀 Módulo 1 - MVP Básico (Concluído)
 
-------------------------------------------------------------------------
+A fase inicial consistiu em estabelecer o **núcleo do Stratega**, garantindo que as operações básicas financeiras ocorressem com sucesso.
 
-# Fase 4 --- Services (Lógica de Negócio)
+- Base do projeto Spring Boot estabelecida.
+- Estrutura de Arquitetura Hexagonal (Controller → UseCase → Repository).
+- Entidades criadas (`User`, `Wallet`, `Category`, `Transaction`).
+- Funcionalidades de Criar Usuário, Carteiras, Categorias e Transações.
+- Transferências internas entre carteiras.
+- Lógica de atualização automática de saldo (`INCOME` soma, `EXPENSE` subtrai).
 
-Objetivo: Centralizar regras de negócio.
+---
 
-Estrutura padrão:
+## 🔐 Módulo 2 - Segurança e Qualidade de Borda (Concluído)
 
-Controller → Service → Repository
+Melhorias para garantir que a API seja consumível por um front-end moderno.
 
-Nunca acessar Repository diretamente no Controller.
+- **Autenticação JWT:** Endpoints de login e registro gerando tokens JWT.
+- **Onboarding Automático:** Criação de uma carteira "Minha Carteira" no cadastro.
+- **Isolamento de Dados (Ownership):** Filtro via JWT para que o usuário veja e altere apenas seus próprios dados (403 Forbidden).
+- **Tratamento Global de Erros:** Padronização de erros (400 Bad Request, 403 Forbidden, 404 Not Found) via `GlobalExceptionHandler`.
+- **Desacoplamento de Entidades:** Uso estrito de DTOs (`Request` e `Response`) nos Controllers, blindando o domínio.
 
-## Services necessários
+---
 
-UserService\
-WalletService\
-CategoryService\
-TransactionService
+## 👥 Módulo 3 - Social Finance / Despesas em Grupo (Concluído)
 
-------------------------------------------------------------------------
+Módulo complexo de divisão de contas para viagens e rachadinhas.
 
-# TransactionService
+- **Criação de Grupos:** Usuário logado vira "owner", adição livre de "members".
+- **Tracking de Despesas:** Possibilidade de lançar gastos associados a grupos.
+- **Estratégias de Divisão (`SplitType`):**
+  - `UNIFORM`: Divisão igualitária automática.
+  - `EXACT`: Lançamento de valores exatos por pessoa.
+  - `PERCENTAGE`: Divisão baseada na cota percentual de cada um (deve somar 100%).
+  - `SHARE`: Cotas de peso (Ex: 2 porções para João, 1 porção para Maria).
+- **Liquidação Otimizada (`SuggestedTransfers`):** Algoritmo que calcula "quem deve para quem" de forma a reduzir o número de transferências necessárias.
+- **Tracking Temporal:** Adicionado suporte à data nas transações de grupo.
 
-## 1. Criar transação
+---
 
-Método:
+## 🛠️ Módulo 4 - Flexibilidade e Operação Avançada (Concluído)
 
-createTransaction()
+Garantindo liberdade e fluidez para a experiência do usuário.
 
-Responsabilidades:
+- **Edição Avançada de Transações:**
+  - Endpoint `PUT /api/transactions/{id}`.
+  - Dupla Reversão em Transferências: Alterar o valor de uma transferência recalcula automaticamente o saldo da carteira de Origem e de Destino (mantendo integridade total).
+  - Troca dinâmica de carteira devolvendo saldo para a carteira velha e debitando da nova.
+  - Saldos Negativos permitidos por design para simular cartões de crédito.
+- **Endpoints de Listagem Puros:** Criação dos GETters (`/api/wallets`, `/api/transactions`, `/api/groups`) já filtrando por usuário, preparando o terreno para dashboards.
 
-- verificar se categoria existe
-- criar categoria se não existir
-- associar categoria à transação
-- salvar transação
-- atualizar saldo da carteira
+---
 
-Fluxo:
+## 🔮 Backlog de Expansão (Implementações Futuras)
 
-1 Receber Transaction\
-2 Verificar Category\
-3 Criar Category se necessário\
-4 Salvar Transaction\
-5 Atualizar saldo da Wallet
+As próximas funcionalidades a serem implementadas no backend à medida que o projeto crescer:
 
-------------------------------------------------------------------------
-
-## 2. Transferência entre carteiras
-
-Método:
-
-createTransfer()
-
-Responsabilidades:
-
-- validar carteiras
-- debitar carteira origem
-- creditar carteira destino
-- registrar transaction do tipo TRANSFER
-
-Fluxo:
-
-1 Receber originWalletId\
-2 Receber originWalletId\
-3 Receber amount\
-4 Atualizar saldo origem\
-5 Atualizar saldo destino\
-6 Salvar transaction
-
-------------------------------------------------------------------------
-
-# Fase 5 --- Controllers (API REST)
-
-Objetivo: Expor endpoints para o sistema.
-
-## TransactionController
-
-Endpoints necessários:
-
-POST /transactions\
-GET /transactions\
-POST /transactions/transfer
-
-------------------------------------------------------------------------
-
-## Criar transação
-
-Endpoint:
-
-POST /transactions
-
-Exemplo de JSON:
-
-{ "description": "Conta de energia", "amount": 200, "type": "EXPENSE",
-"wallet": { "id": 1 }, "category": { "name": "Casa", "type": "EXPENSE" }
-}
-
-Fluxo interno:
-
-Controller recebe request\
-→ chama TransactionService\
-→ retorna transaction salva
-
-------------------------------------------------------------------------
-
-## Listar transações
-
-Endpoint:
-
-GET /transactions
-
-Melhorias futuras:
-
-GET /transactions?wallet=1\
-GET /transactions?category=2
-
-------------------------------------------------------------------------
-
-## Transferência
-
-Endpoint:
-
-POST /transactions/transfer
-
-Exemplo:
-
-{ "originWalletId": 1, "originWalletId": 2, "amount": 500 }
-
-Fluxo:
-
-Service debita origem\
-Service credita destino\
-Service registra transaction
-
-------------------------------------------------------------------------
-
-# Fase 6 --- Atualização de saldo da Wallet
-
-Regra:
-
-INCOME → soma saldo\
-EXPENSE → subtrai saldo\
-TRANSFER → move entre carteiras
-
-Implementar dentro do TransactionService.
-
-------------------------------------------------------------------------
-
-# Fase 7 --- Validações básicas
-
-Adicionar validações:
-
-- valor da transação maior que zero
-- carteira deve existir
-- não permitir transferência para mesma carteira
-
-------------------------------------------------------------------------
-
-# Fase 8 --- Testes manuais da API
-
-Testar usando:
-
-Postman ou Insomnia
-
-Fluxos para testar:
-
-Criar Wallet\
-Criar Categoria\
-Criar Transaction\
-Listar Transactions\
-Criar Transferência
-
-------------------------------------------------------------------------
-
-# MVP Concluído
-
-O MVP estará completo quando for possível:
-
-Criar usuário\
-Criar carteiras\
-Criar categorias\
-Criar transações\
-Transferir valores entre carteiras\
-Consultar saldo das carteiras\
-Listar transações
-
-------------------------------------------------------------------------
-
-# Próximas evoluções (Pós-MVP)
-
-Expense Sharing
-
-Expense\
-ExpenseParticipant\
-ExpenseShare
-
-Planejamento financeiro
-
-Orçamentos mensais
-
-Dashboard financeiro
-
-Autenticação
-
-JWT + Spring Security
-
-Frontend
-
-Aplicação web ou mobile
-
-------------------------------------------------------------------------
-
-# Meta do projeto
-
-Objetivo inicial:
-
-Backend financeiro funcional capaz de:
-
-- registrar movimentações
-- organizar por carteiras
-- organizar por categorias
-- realizar transferências internas
-
-Esse é o **núcleo do Stratega**.
+1. **Dashboard Analítico**
+   - Agrupamentos por categoria, balanço mensal, despesas vs receitas (SQL otimizado ou paginação).
+2. **Metas Financeiras**
+   - Limites de gastos (orçamentos mensais) com alerta de estouro de teto.
+3. **Lançamentos Recorrentes / Parcelamentos**
+   - Regras de repetição para despesas fixas ou suporte à divisão automática do saldo por meses.
+4. **Anexos**
+   - Upload de imagem/PDF para comprovantes.
+5. **Conciliação Bancária**
+   - Marcar transações como `PENDING` ou `SETTLED`.
+6. **Importação/Exportação**
+   - CSV ou conexão Open Finance no futuro.

@@ -77,6 +77,18 @@ Movimentações financeiras individuais.
           "date": "2026-05-04T15:00:00"
         }
         ```
+*   **PUT `/api/transactions/{id}`**
+    *   Edita uma transação existente. Permite alterar `walletId`, `categoryId`, `amount`, `date` e `description`. O `type` é imutável.
+    *   **Body:**
+        ```json
+        {
+          "description": "Novo Almoço",
+          "amount": 30.00,
+          "date": "2026-05-04T15:00:00",
+          "walletId": "<UUID>",
+          "categoryId": "<UUID> (Opcional)"
+        }
+        ```
  
 ---
  
@@ -102,6 +114,7 @@ Módulo social para dividir contas entre amigos ou familiares.
           "description": "Jantar",
           "amount": 150.0,
           "paidByMemberId": "<UUID>",
+          "date": "2026-05-04T19:30:00",
           "splitType": "UNIFORM",
           "splitValues": {} 
         }

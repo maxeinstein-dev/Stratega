@@ -86,11 +86,14 @@ stratega
 ## 📈 Roadmap Concluído
 
 - [x] Arquitetura Hexagonal estabelecida.
-- [x] Sistema de Autenticação JWT.
-- [x] Gestão de Wallets com atualização de saldo em tempo real.
+- [x] Sistema de Autenticação JWT e Onboarding com criação de carteira padrão.
+- [x] Endpoints de Listagem para alimentar painéis Front-End (GET Wallets, Transactions, Groups).
+- [x] Gestão de Wallets com atualização de saldo em tempo real (suporta saldo negativo).
+- [x] Transações Editáveis: Ajuste de valores, datas, categorias e transferências com dupla reversão de saldo.
 - [x] Transferências entre carteiras com transações vinculadas.
-- [x] Módulo de Despesas em Grupo com 4 tipos de split.
+- [x] Módulo de Despesas em Grupo com 4 tipos de split e tracking de datas e permissões de acesso.
 - [x] Algoritmo de liquidação de dívidas (Suggested Transfers).
+- [x] Tratamento de Erros Padronizados Globais (400, 403, 404).
 - [x] Cobertura de testes superior a 90% nas regras críticas.
 
 ---
