@@ -18,6 +18,10 @@ O Stratega vai além do simples registro de gastos, oferecendo:
     *   Divisão de despesas entre múltiplos participantes.
     *   **4 Estratégias de Divisão:** Uniforme, Exata, Porcentagem e Por Cotas (Shares).
     *   **Algoritmo de Otimização:** Sugestão do número mínimo de transferências para liquidar dívidas do grupo.
+*   **Diferenciais de Usabilidade:**
+    *   **Identidade Automática:** O sistema identifica o usuário pelo Token JWT (dispensa IDs manuais em headers).
+    *   **Onboarding Fluido:** Criação automática de uma carteira padrão no cadastro do usuário.
+    *   **Listagens de Dados (Dashboards):** Endpoints completos para listar carteiras, histórico de transações e grupos vinculados ao usuário logado.
 
 ---
 
@@ -75,7 +79,7 @@ stratega
     ./mvnw spring-boot:run
     ```
 4.  **Acessar a Documentação:**
-    O Swagger/OpenAPI estará disponível em: `http://localhost:8080/swagger-ui.html`
+    O Swagger/OpenAPI estará disponível em: `http://localhost:8081/swagger-ui/index.html`
 
 ---
 
