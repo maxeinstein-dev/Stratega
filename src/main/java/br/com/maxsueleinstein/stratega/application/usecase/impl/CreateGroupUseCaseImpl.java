@@ -6,8 +6,6 @@ import br.com.maxsueleinstein.stratega.domain.model.ExpenseGroup;
 import br.com.maxsueleinstein.stratega.domain.model.ExpenseGroupMember;
 import br.com.maxsueleinstein.stratega.domain.repository.ExpenseGroupRepository;
 
-import java.util.UUID;
-
 public class CreateGroupUseCaseImpl implements CreateGroupUseCase {
 
     private final ExpenseGroupRepository repository;

@@ -1,7 +1,7 @@
 package br.com.maxsueleinstein.stratega.presentation.controller;
-
+ 
 import br.com.maxsueleinstein.stratega.application.dto.CreateWalletRequest;
-import br.com.maxsueleinstein.stratega.domain.repository.WalletRepository;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +29,6 @@ public class WalletControllerIntegrationTest {
     private WebApplicationContext context;
 
     private ObjectMapper objectMapper = new ObjectMapper();
-
-    @Autowired
-    private WalletRepository walletRepository;
 
     @BeforeEach
     void setUp() {
