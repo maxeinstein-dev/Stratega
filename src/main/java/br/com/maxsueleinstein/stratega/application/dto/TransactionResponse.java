@@ -10,6 +10,7 @@ public record TransactionResponse(
         UUID id,
         String description,
         BigDecimal amount,
+        BigDecimal netAmount,
         LocalDateTime date,
         TransactionType type,
         UUID walletId,

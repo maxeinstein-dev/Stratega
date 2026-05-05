@@ -13,6 +13,7 @@ public class Transaction {
     private final UUID id;
     private String description;
     private BigDecimal amount;
+    private BigDecimal netAmount; // Valor líquido (cota real do usuário em despesas de grupo). Null = usa amount.
     private LocalDateTime date;
     private final TransactionType type;
     private UUID walletId;
@@ -21,10 +22,15 @@ public class Transaction {
 
     public Transaction(UUID id, String description, BigDecimal amount, LocalDateTime date,
             TransactionType type, UUID walletId, UUID categoryId, UUID linkedTransactionId) {
+        this(id, description, amount, null, date, type, walletId, categoryId, linkedTransactionId);
+    }
+
+    public Transaction(UUID id, String description, BigDecimal amount, BigDecimal netAmount, LocalDateTime date,
+            TransactionType type, UUID walletId, UUID categoryId, UUID linkedTransactionId) {
         validateDescription(description);
         validateAmount(amount);
         validateDate(date);
-        
+
         if (type == null) {
             throw new IllegalArgumentException("O tipo da transação é obrigatório");
         }
@@ -35,6 +41,7 @@ public class Transaction {
         this.id = id != null ? id : UUID.randomUUID();
         this.description = description;
         this.amount = amount;
+        this.netAmount = netAmount;
         this.date = date;
         this.type = type;
         this.walletId = walletId;
@@ -94,6 +101,19 @@ public class Transaction {
 
     public BigDecimal getAmount() {
         return amount;
+    }
+
+    public BigDecimal getNetAmount() {
+        return netAmount;
+    }
+
+    /** Retorna o valor líquido (cota real) se definido, ou o valor total caso contrário. */
+    public BigDecimal getEffectiveAmount() {
+        return netAmount != null ? netAmount : amount;
+    }
+
+    public void setNetAmount(BigDecimal netAmount) {
+        this.netAmount = netAmount;
     }
 
     public LocalDateTime getDate() {

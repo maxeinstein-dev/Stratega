@@ -26,6 +26,7 @@ public class TransactionEntity {
     private UUID id;
     private String description;
     private BigDecimal amount;
+    private BigDecimal netAmount;
     private LocalDateTime date;
     
     @Enumerated(EnumType.STRING)

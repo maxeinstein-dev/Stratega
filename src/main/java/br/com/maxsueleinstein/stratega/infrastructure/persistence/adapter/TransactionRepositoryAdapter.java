@@ -46,4 +46,19 @@ public class TransactionRepositoryAdapter implements TransactionRepository {
                 .map(TransactionMapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public boolean existsByWalletId(UUID walletId) {
+        return repository.existsByWalletId(walletId);
+    }
+
+    @Override
+    public boolean existsByCategoryId(UUID categoryId) {
+        return repository.existsByCategoryId(categoryId);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        repository.deleteById(id);
+    }
 }

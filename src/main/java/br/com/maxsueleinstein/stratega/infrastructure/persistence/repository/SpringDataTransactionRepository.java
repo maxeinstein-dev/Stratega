@@ -16,4 +16,7 @@ public interface SpringDataTransactionRepository extends JpaRepository<Transacti
 
     @Query("SELECT t FROM TransactionEntity t JOIN WalletEntity w ON t.walletId = w.id WHERE w.userId = :userId ORDER BY t.date DESC")
     List<TransactionEntity> findByUserId(@Param("userId") UUID userId);
+
+    boolean existsByWalletId(UUID walletId);
+    boolean existsByCategoryId(UUID categoryId);
 }

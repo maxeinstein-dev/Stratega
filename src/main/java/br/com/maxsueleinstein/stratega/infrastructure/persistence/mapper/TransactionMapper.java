@@ -11,6 +11,7 @@ public class TransactionMapper {
                 entity.getId(),
                 entity.getDescription(),
                 entity.getAmount(),
+                entity.getNetAmount(),
                 entity.getDate(),
                 entity.getType(),
                 entity.getWalletId(),
@@ -25,6 +26,7 @@ public class TransactionMapper {
                 .id(domain.getId())
                 .description(domain.getDescription())
                 .amount(domain.getAmount())
+                .netAmount(domain.getNetAmount())
                 .date(domain.getDate())
                 .type(domain.getType())
                 .walletId(domain.getWalletId())

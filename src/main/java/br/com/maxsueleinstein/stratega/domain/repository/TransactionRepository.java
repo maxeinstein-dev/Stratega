@@ -10,4 +10,7 @@ public interface TransactionRepository {
     Optional<Transaction> findById(UUID id);
     List<Transaction> findByWalletId(UUID walletId);
     List<Transaction> findByUserId(UUID userId);
+    boolean existsByWalletId(UUID walletId);
+    boolean existsByCategoryId(UUID categoryId);
+    void deleteById(UUID id);
 }
