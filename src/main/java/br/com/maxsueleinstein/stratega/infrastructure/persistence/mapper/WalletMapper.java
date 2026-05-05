@@ -7,7 +7,7 @@ public class WalletMapper {
 
     public static Wallet toDomain(WalletEntity entity) {
         if (entity == null) return null;
-        return new Wallet(entity.getId(), entity.getName(), entity.getBalance(), entity.getUserId());
+        return new Wallet(entity.getId(), entity.getName(), entity.getBalance(), entity.getUserId(), entity.isActive());
     }
 
     public static WalletEntity toEntity(Wallet domain) {
@@ -17,6 +17,7 @@ public class WalletMapper {
                 .name(domain.getName())
                 .balance(domain.getBalance())
                 .userId(domain.getUserId())
+                .active(domain.isActive())
                 .build();
     }
 }

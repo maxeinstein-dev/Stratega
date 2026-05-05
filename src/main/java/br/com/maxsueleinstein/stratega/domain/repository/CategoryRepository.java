@@ -9,4 +9,5 @@ public interface CategoryRepository {
     Category save(Category category);
     Optional<Category> findById(UUID id);
     List<Category> findByUserIdOrGlobal(UUID userId);
+    void deleteById(UUID id);
 }

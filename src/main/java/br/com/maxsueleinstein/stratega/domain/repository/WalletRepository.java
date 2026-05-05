@@ -9,4 +9,5 @@ public interface WalletRepository {
     Wallet save(Wallet wallet);
     Optional<Wallet> findById(UUID id);
     List<Wallet> findByUserId(UUID userId);
+    void deleteById(UUID id);
 }

@@ -39,4 +39,9 @@ public class CategoryRepositoryAdapter implements CategoryRepository {
                 .map(CategoryMapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteById(UUID id) {
+        repository.deleteById(id);
+    }
 }

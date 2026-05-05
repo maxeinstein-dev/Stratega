@@ -14,17 +14,23 @@ public class Wallet {
     private String name;
     private BigDecimal balance;
     private final UUID userId;
+    private boolean active;
 
     public Wallet(UUID id, String name, BigDecimal initialBalance, UUID userId) {
+        this(id, name, initialBalance, userId, true);
+    }
+
+    public Wallet(UUID id, String name, BigDecimal initialBalance, UUID userId, boolean active) {
         validateName(name);
         if (userId == null) {
             throw new IllegalArgumentException("O usuário dono da carteira é obrigatório");
         }
-        
+
         this.id = id != null ? id : UUID.randomUUID();
         this.name = name;
         this.balance = initialBalance != null ? initialBalance : BigDecimal.ZERO;
         this.userId = userId;
+        this.active = active;
     }
 
     public void updateName(String name) {
@@ -44,6 +50,14 @@ public class Wallet {
             throw new IllegalArgumentException("O valor a ser removido deve ser maior que zero");
         }
         this.balance = this.balance.subtract(amount);
+    }
+
+    public void archive() {
+        this.active = false;
+    }
+
+    public boolean isActive() {
+        return active;
     }
 
     private void validateName(String name) {

@@ -23,4 +23,6 @@ public class WalletEntity {
     private String name;
     private BigDecimal balance;
     private UUID userId;
+    @Builder.Default
+    private boolean active = true;
 }
