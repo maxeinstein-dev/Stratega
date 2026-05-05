@@ -14,13 +14,14 @@ public class Wallet {
     private String name;
     private BigDecimal balance;
     private final UUID userId;
+    private final Currency currency;
     private boolean active;
 
     public Wallet(UUID id, String name, BigDecimal initialBalance, UUID userId) {
-        this(id, name, initialBalance, userId, true);
+        this(id, name, initialBalance, userId, Currency.BRL, true);
     }
 
-    public Wallet(UUID id, String name, BigDecimal initialBalance, UUID userId, boolean active) {
+    public Wallet(UUID id, String name, BigDecimal initialBalance, UUID userId, Currency currency, boolean active) {
         validateName(name);
         if (userId == null) {
             throw new IllegalArgumentException("O usuário dono da carteira é obrigatório");
@@ -30,6 +31,7 @@ public class Wallet {
         this.name = name;
         this.balance = initialBalance != null ? initialBalance : BigDecimal.ZERO;
         this.userId = userId;
+        this.currency = currency != null ? currency : Currency.BRL;
         this.active = active;
     }
 
@@ -80,6 +82,10 @@ public class Wallet {
 
     public UUID getUserId() {
         return userId;
+    }
+
+    public Currency getCurrency() {
+        return currency;
     }
 
     @Override

@@ -35,6 +35,7 @@ public class UpdateWalletUseCaseImpl implements UpdateWalletUseCase {
                 savedWallet.getName(),
                 savedWallet.getBalance(),
                 savedWallet.getUserId(),
+                savedWallet.getCurrency(),
                 savedWallet.isActive()
         );
     }

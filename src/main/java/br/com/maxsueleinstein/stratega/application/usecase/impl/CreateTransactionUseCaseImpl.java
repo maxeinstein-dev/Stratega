@@ -8,14 +8,32 @@ import br.com.maxsueleinstein.stratega.domain.model.Wallet;
 import br.com.maxsueleinstein.stratega.domain.repository.TransactionRepository;
 import br.com.maxsueleinstein.stratega.domain.repository.WalletRepository;
 
+import br.com.maxsueleinstein.stratega.domain.event.BudgetExceededEvent;
+import br.com.maxsueleinstein.stratega.domain.model.Budget;
+import br.com.maxsueleinstein.stratega.domain.repository.BudgetRepository;
+import br.com.maxsueleinstein.stratega.domain.repository.CategoryRepository;
+import org.springframework.context.ApplicationEventPublisher;
+
+import java.util.Optional;
+
 public class CreateTransactionUseCaseImpl implements CreateTransactionUseCase {
 
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
+    private final BudgetRepository budgetRepository;
+    private final CategoryRepository categoryRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public CreateTransactionUseCaseImpl(TransactionRepository transactionRepository, WalletRepository walletRepository) {
+    public CreateTransactionUseCaseImpl(TransactionRepository transactionRepository, 
+                                      WalletRepository walletRepository,
+                                      BudgetRepository budgetRepository,
+                                      CategoryRepository categoryRepository,
+                                      ApplicationEventPublisher eventPublisher) {
         this.transactionRepository = transactionRepository;
         this.walletRepository = walletRepository;
+        this.budgetRepository = budgetRepository;
+        this.categoryRepository = categoryRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -63,6 +81,11 @@ public class CreateTransactionUseCaseImpl implements CreateTransactionUseCase {
 
             Transaction savedTransaction = transactionRepository.save(transaction);
 
+            // Check budget for expenses with category
+            if (savedTransaction.isExpense() && savedTransaction.getCategoryId() != null) {
+                checkBudgetExceeded(savedTransaction, wallet.getUserId());
+            }
+
             responses.add(new TransactionResponse(
                     savedTransaction.getId(),
                     savedTransaction.getDescription(),
@@ -78,5 +101,40 @@ public class CreateTransactionUseCaseImpl implements CreateTransactionUseCase {
 
         walletRepository.save(wallet);
         return responses;
+    }
+
+    private void checkBudgetExceeded(Transaction transaction, java.util.UUID userId) {
+        int month = transaction.getDate().getMonthValue();
+        int year = transaction.getDate().getYear();
+
+        Optional<Budget> budgetOpt = budgetRepository.findByCategoryAndMonthAndYear(
+                transaction.getCategoryId(), month, year);
+
+        if (budgetOpt.isPresent()) {
+            Budget budget = budgetOpt.get();
+            
+            // Calculate current spent for this category/month/year
+            java.math.BigDecimal currentSpent = transactionRepository.findByUserId(userId).stream()
+                    .filter(tx -> tx.isExpense() && 
+                                  tx.getCategoryId() != null && 
+                                  tx.getCategoryId().equals(transaction.getCategoryId()) &&
+                                  tx.getDate().getMonthValue() == month &&
+                                  tx.getDate().getYear() == year)
+                    .map(Transaction::getEffectiveAmount)
+                    .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
+            if (currentSpent.compareTo(budget.getAmountLimit()) > 0) {
+                String categoryName = categoryRepository.findById(transaction.getCategoryId())
+                        .map(br.com.maxsueleinstein.stratega.domain.model.Category::getName)
+                        .orElse("Categoria");
+                
+                eventPublisher.publishEvent(new BudgetExceededEvent(
+                        userId,
+                        categoryName,
+                        budget.getAmountLimit(),
+                        currentSpent
+                ));
+            }
+        }
     }
 }

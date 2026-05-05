@@ -38,11 +38,12 @@ Representam contas bancárias, dinheiro em espécie ou cartões de crédito.
  
 *   **POST `/api/wallets`**
     *   Cria uma nova carteira para o usuário logado.
-    *   **Body:** `{ "name": "...", "initialBalance": 0.0 }`
-    *   **Response:** `201 Created` - `{ "id": "...", "name": "...", "balance": 0.0, "userId": "..." }`
+    *   **Body:** `{ "name": "...", "initialBalance": 0.0, "currency": "USD" }`
+    *   **Response:** `201 Created` - `{ "id": "...", "name": "...", "balance": 0.0, "currency": "USD", "userId": "..." }`
 *   **GET `/api/wallets`**
     *   Retorna a lista de carteiras do usuário logado.
-    *   **Response:** `200 OK` - `[ { "id": "...", "name": "...", "balance": 0.0, "userId": "..." } ]`
+    *   **Response:** `200 OK` - `[ { "id": "...", "name": "...", "balance": 0.0, "currency": "BRL", "userId": "..." } ]`
+    *   **Moedas Suportadas:** `BRL`, `USD`, `EUR`, `GBP`, `BTC`.
  
 ---
  
@@ -159,10 +160,30 @@ Fornece resumos agregados para a tela inicial.
           }
         }
         ```
+    *   **Nota:** Os valores são automaticamente convertidos para a moeda base (BRL) usando taxas de câmbio atualizadas.
+ 
+*   **GET `/api/dashboard/reports/trend?month=5&year=2026`**
+    *   Retorna os gastos acumulados dia a dia para gráficos de linha.
+    *   **Response:** `[ { "date": "2026-05-01", "amount": 50.00 }, ... ]`
+ 
+*   **GET `/api/dashboard/reports/comparison?month=5&year=2026`**
+    *   Compara o gasto de cada categoria com o mês anterior.
+    *   **Response:** `{ "Alimentação": { "currentMonth": 800, "previousMonth": 750, "differencePercentage": 6.67 } }`
  
 ---
  
-### 6. Metas Financeiras / Orçamentos (`/api/budgets`)
+### 6. Notificações (`/api/notifications`)
+Sistema de alertas automáticos (ex: limite de orçamento atingido).
+ 
+*   **GET `/api/notifications`**
+    *   Retorna a lista de notificações do usuário.
+    *   **Response:** `[ { "id": "...", "title": "...", "message": "...", "isRead": false, "createdAt": "..." } ]`
+*   **PATCH `/api/notifications/{id}/read`**
+    *   Marca uma notificação como lida.
+ 
+---
+ 
+### 7. Metas Financeiras / Orçamentos (`/api/budgets`)
 Define limites de gastos mensais por categoria.
  
 *   **POST `/api/budgets`**

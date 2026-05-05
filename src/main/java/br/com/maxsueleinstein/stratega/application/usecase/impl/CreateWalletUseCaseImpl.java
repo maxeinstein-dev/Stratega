@@ -16,13 +16,14 @@ public class CreateWalletUseCaseImpl implements CreateWalletUseCase {
 
     @Override
     public WalletResponse execute(CreateWalletRequest request) {
-        Wallet wallet = new Wallet(null, request.name(), request.initialBalance(), request.userId());
+        Wallet wallet = new Wallet(null, request.name(), request.initialBalance(), request.userId(), request.currency(), true);
         Wallet savedWallet = walletRepository.save(wallet);
         return new WalletResponse(
                 savedWallet.getId(),
                 savedWallet.getName(),
                 savedWallet.getBalance(),
                 savedWallet.getUserId(),
+                savedWallet.getCurrency(),
                 savedWallet.isActive()
         );
     }

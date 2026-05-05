@@ -1,5 +1,6 @@
 package br.com.maxsueleinstein.stratega.infrastructure.persistence.mapper;
 
+import br.com.maxsueleinstein.stratega.domain.model.Currency;
 import br.com.maxsueleinstein.stratega.domain.model.Wallet;
 import br.com.maxsueleinstein.stratega.infrastructure.persistence.entity.WalletEntity;
 
@@ -7,7 +8,11 @@ public class WalletMapper {
 
     public static Wallet toDomain(WalletEntity entity) {
         if (entity == null) return null;
-        return new Wallet(entity.getId(), entity.getName(), entity.getBalance(), entity.getUserId(), entity.isActive());
+        Currency currency = entity.getCurrency() != null 
+            ? Currency.valueOf(entity.getCurrency()) 
+            : Currency.BRL;
+            
+        return new Wallet(entity.getId(), entity.getName(), entity.getBalance(), entity.getUserId(), currency, entity.isActive());
     }
 
     public static WalletEntity toEntity(Wallet domain) {
@@ -17,6 +22,7 @@ public class WalletMapper {
                 .name(domain.getName())
                 .balance(domain.getBalance())
                 .userId(domain.getUserId())
+                .currency(domain.getCurrency().name())
                 .active(domain.isActive())
                 .build();
     }

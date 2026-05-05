@@ -8,22 +8,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "wallets")
+@Table(name = "notifications")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WalletEntity {
+public class NotificationEntity {
     @Id
     private UUID id;
-    private String name;
-    private BigDecimal balance;
     private UUID userId;
-    private String currency;
-    @Builder.Default
-    private boolean active = true;
+    private String title;
+    private String message;
+    private String type;
+    private boolean isRead;
+    private LocalDateTime createdAt;
 }

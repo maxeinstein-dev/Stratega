@@ -9,21 +9,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "wallets")
+@Table(name = "exchange_rates")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WalletEntity {
+public class ExchangeRateEntity {
     @Id
-    private UUID id;
-    private String name;
-    private BigDecimal balance;
-    private UUID userId;
-    private String currency;
-    @Builder.Default
-    private boolean active = true;
+    private String pair; // Ex: USD_BRL
+    private BigDecimal rate;
+    private LocalDateTime lastUpdated;
 }

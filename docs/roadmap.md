@@ -82,6 +82,11 @@ Foco em garantir a precisão matemática absoluta e facilitar acertos de contas.
 - **Soft Delete de Carteiras:** Bloqueio de exclusão física para carteiras com histórico, permitindo apenas o arquivamento para preservar relatórios passados.
 - **Segurança em Categorias:** Proteção contra edição de categorias globais e deleção de categorias em uso.
 
+### Módulo 7: Globalização e Engajamento ✅
+- **Globalização (Multi-Moedas):** Suporte a carteiras em USD/EUR com conversão automática via ExchangeRate-API (US16).
+- **Notificações Inteligentes:** Sistema de alertas in-app para orçamentos atingidos (US17).
+- **Relatórios Avançados:** Gráficos de tendência e comparativos mensais (US18).
+
 ---
 
 ## 🔮 Backlog de Expansão (Implementações Futuras)
@@ -94,9 +99,7 @@ As próximas funcionalidades a serem implementadas no backend à medida que o pr
    - Marcar transações como `PENDING` ou `SETTLED` para controle mais rígido.
 3. **Integração Open Finance**
    - Conexão com APIs bancárias reais para leitura automática de extratos.
-4. **Notificações (Push / Webhook)**
-   - Alertas de "Meta Financeira Atingida" ou "Boleto Vencendo Hoje".
-5. **Multi-Moedas e Câmbio**
-   - Suporte a carteiras em Dólar/Euro com conversão em tempo real.
-6. **Insights com IA**
+4. **Insights com IA**
    - Dicas automáticas de economia baseadas no padrão de consumo do usuário.
+5. **Notificações Externas**
+   - Integração com Push Notifications e Email.

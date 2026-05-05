@@ -32,8 +32,13 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public CreateTransactionUseCase createTransactionUseCase(TransactionRepository transactionRepository, WalletRepository walletRepository) {
-        return new CreateTransactionUseCaseImpl(transactionRepository, walletRepository);
+    public CreateTransactionUseCase createTransactionUseCase(
+            TransactionRepository transactionRepository, 
+            WalletRepository walletRepository,
+            br.com.maxsueleinstein.stratega.domain.repository.BudgetRepository budgetRepository,
+            br.com.maxsueleinstein.stratega.domain.repository.CategoryRepository categoryRepository,
+            org.springframework.context.ApplicationEventPublisher eventPublisher) {
+        return new CreateTransactionUseCaseImpl(transactionRepository, walletRepository, budgetRepository, categoryRepository, eventPublisher);
     }
 
     @Bean
@@ -82,8 +87,13 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public br.com.maxsueleinstein.stratega.application.usecase.GetDashboardSummaryUseCase getDashboardSummaryUseCase(TransactionRepository transactionRepository, br.com.maxsueleinstein.stratega.domain.repository.CategoryRepository categoryRepository) {
-        return new br.com.maxsueleinstein.stratega.application.usecase.impl.GetDashboardSummaryUseCaseImpl(transactionRepository, categoryRepository);
+    public br.com.maxsueleinstein.stratega.application.usecase.GetDashboardSummaryUseCase getDashboardSummaryUseCase(
+            TransactionRepository transactionRepository, 
+            br.com.maxsueleinstein.stratega.domain.repository.CategoryRepository categoryRepository,
+            WalletRepository walletRepository,
+            br.com.maxsueleinstein.stratega.domain.service.ExchangeRateService exchangeRateService) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.GetDashboardSummaryUseCaseImpl(
+                transactionRepository, categoryRepository, walletRepository, exchangeRateService);
     }
 
     @Bean
@@ -144,5 +154,25 @@ public class UseCaseConfig {
     @Bean
     public br.com.maxsueleinstein.stratega.application.usecase.SettleGroupDebtUseCase settleGroupDebtUseCase(br.com.maxsueleinstein.stratega.domain.repository.ExpenseGroupRepository groupRepository, WalletRepository walletRepository, TransactionRepository transactionRepository) {
         return new br.com.maxsueleinstein.stratega.application.usecase.impl.SettleGroupDebtUseCaseImpl(groupRepository, walletRepository, transactionRepository);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.GetNotificationsUseCase getNotificationsUseCase(br.com.maxsueleinstein.stratega.domain.repository.NotificationRepository notificationRepository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.GetNotificationsUseCaseImpl(notificationRepository);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.MarkNotificationAsReadUseCase markNotificationAsReadUseCase(br.com.maxsueleinstein.stratega.domain.repository.NotificationRepository notificationRepository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.MarkNotificationAsReadUseCaseImpl(notificationRepository);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.GetSpendingTrendUseCase getSpendingTrendUseCase(TransactionRepository transactionRepository, WalletRepository walletRepository, br.com.maxsueleinstein.stratega.domain.service.ExchangeRateService exchangeRateService) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.GetSpendingTrendUseCaseImpl(transactionRepository, walletRepository, exchangeRateService);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.GetCategoryComparisonUseCase getCategoryComparisonUseCase(TransactionRepository transactionRepository, br.com.maxsueleinstein.stratega.domain.repository.CategoryRepository categoryRepository, WalletRepository walletRepository, br.com.maxsueleinstein.stratega.domain.service.ExchangeRateService exchangeRateService) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.GetCategoryComparisonUseCaseImpl(transactionRepository, categoryRepository, walletRepository, exchangeRateService);
     }
 }
