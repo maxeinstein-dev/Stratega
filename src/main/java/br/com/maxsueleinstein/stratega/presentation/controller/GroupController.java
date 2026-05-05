@@ -19,15 +19,18 @@ public class GroupController {
     private final AddGroupExpenseUseCase addGroupExpenseUseCase;
     private final CalculateGroupBalancesUseCase calculateGroupBalancesUseCase;
     private final br.com.maxsueleinstein.stratega.application.usecase.FindGroupsByUserIdUseCase findGroupsByUserIdUseCase;
- 
+    private final br.com.maxsueleinstein.stratega.application.usecase.SettleGroupDebtUseCase settleGroupDebtUseCase;
+
     public GroupController(CreateGroupUseCase createGroupUseCase, 
                            AddGroupExpenseUseCase addGroupExpenseUseCase, 
                            CalculateGroupBalancesUseCase calculateGroupBalancesUseCase,
-                           br.com.maxsueleinstein.stratega.application.usecase.FindGroupsByUserIdUseCase findGroupsByUserIdUseCase) {
+                           br.com.maxsueleinstein.stratega.application.usecase.FindGroupsByUserIdUseCase findGroupsByUserIdUseCase,
+                           br.com.maxsueleinstein.stratega.application.usecase.SettleGroupDebtUseCase settleGroupDebtUseCase) {
         this.createGroupUseCase = createGroupUseCase;
         this.addGroupExpenseUseCase = addGroupExpenseUseCase;
         this.calculateGroupBalancesUseCase = calculateGroupBalancesUseCase;
         this.findGroupsByUserIdUseCase = findGroupsByUserIdUseCase;
+        this.settleGroupDebtUseCase = settleGroupDebtUseCase;
     }
  
     @PostMapping
@@ -75,6 +78,14 @@ public class GroupController {
         java.util.UUID userId = java.util.UUID.fromString((String) authentication.getPrincipal());
 
         return ResponseEntity.ok(calculateGroupBalancesUseCase.execute(groupId, userId));
+    }
+    @PostMapping("/{groupId}/settle")
+    public ResponseEntity<Void> settleDebt(@PathVariable UUID groupId, @RequestBody SettleDebtRequest request) {
+        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        java.util.UUID userId = java.util.UUID.fromString((String) authentication.getPrincipal());
+ 
+        settleGroupDebtUseCase.execute(groupId, userId, request);
+        return ResponseEntity.noContent().build();
     }
  
     private GroupResponse toResponse(ExpenseGroup group) {
