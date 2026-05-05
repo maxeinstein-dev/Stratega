@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  stratega-db:
+    image: postgres:15-alpine
+    container_name: stratega-db
+    environment:
+      POSTGRES_DB: stratega
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - stratega-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  stratega-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stratega-api
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=stratega-db
+      - DB_PORT=5432
+      - DB_NAME=stratega
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - JWT_SECRET=U29tZVN1cGVyU2VjcmV0S2V5Rm9yU3RyYXRlZ2FBcHBsaWNhdGlvblByb2R1Y3Rpb24=
+      - JWT_EXPIRATION=86400000
+    depends_on:
+      stratega-db:
+        condition: service_healthy
+
+volumes:
+  stratega-db-data:

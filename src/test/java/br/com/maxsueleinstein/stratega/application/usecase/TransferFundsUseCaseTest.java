@@ -25,13 +25,15 @@ class TransferFundsUseCaseTest {
 
     private TransactionRepository transactionRepository;
     private WalletRepository walletRepository;
+    private br.com.maxsueleinstein.stratega.domain.repository.TransferRepository transferRepository;
     private TransferFundsUseCase transferFundsUseCase;
 
     @BeforeEach
     void setUp() {
         transactionRepository = Mockito.mock(TransactionRepository.class);
         walletRepository = Mockito.mock(WalletRepository.class);
-        transferFundsUseCase = new TransferFundsUseCaseImpl(walletRepository, transactionRepository);
+        transferRepository = Mockito.mock(br.com.maxsueleinstein.stratega.domain.repository.TransferRepository.class);
+        transferFundsUseCase = new TransferFundsUseCaseImpl(walletRepository, transactionRepository, transferRepository);
     }
 
     @Test
@@ -63,5 +65,6 @@ class TransferFundsUseCaseTest {
         verify(walletRepository).save(origin);
         verify(walletRepository).save(destination);
         verify(transactionRepository, times(2)).save(any(Transaction.class));
+        verify(transferRepository).save(any(br.com.maxsueleinstein.stratega.domain.model.Transfer.class));
     }
 }

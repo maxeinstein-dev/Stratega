@@ -64,7 +64,12 @@ Movimentações financeiras individuais.
         ```
 *   **GET `/api/transactions`**
     *   Retorna o histórico de transações do usuário logado (ordenado por data decrescente).
-    *   **Response:** `200 OK` - `[ { "id": "...", "description": "Almoço", "amount": 25.50, "date": "...", "type": "EXPENSE", ... } ]`
+    *   **Response:** `200 OK` - `[ { "id": "...", "description": "Almoço", "amount": 25.50, "netAmount": 25.50, "date": "...", "type": "EXPENSE", ... } ]`
+    *   **Nota:** O campo `netAmount` representa a cota real do usuário (relevante em despesas de grupo). Se for `null`, o valor real é o `amount`.
+*   **DELETE `/api/transactions/{id}`**
+    *   Exclui uma transação e **reverte automaticamente** o impacto no saldo da carteira.
+    *   Se a transação for parte de uma transferência, ambas as pernas são excluídas e os saldos de ambas as carteiras são corrigidos.
+    *   **Response:** `204 No Content`
 *   **POST `/api/transactions/transfer`**
     *   Realiza transferência entre duas carteiras do usuário logado.
     *   **Body:**
@@ -121,7 +126,93 @@ Módulo social para dividir contas entre amigos ou familiares.
         ```
 *   **GET `/api/groups/{groupId}/balances`**
     *   Retorna o balanço de cada membro e as **transferências sugeridas**.
+*   **POST `/api/groups/{groupId}/settle`**
+    *   Realiza a liquidação de uma dívida (Settle Debt).
+    *   **Duplo Impacto:** Registra a quitação no grupo e **injeta o saldo** na carteira escolhida pelo usuário.
+    *   **Body:**
+        ```json
+        {
+          "memberId": "<UUID do Membro que está pagando>",
+          "amount": 50.00,
+          "destinationWalletId": "<UUID da sua carteira que receberá o valor>",
+          "description": "Acerto de contas (Opcional)"
+        }
+        ```
+    *   **Response:** `204 No Content`
  
+---
+ 
+### 5. Dashboard Analítico (`/api/dashboard`)
+Fornece resumos agregados para a tela inicial.
+ 
+*   **GET `/api/dashboard/summary?month=5&year=2026`**
+    *   Os parâmetros `month` e `year` são opcionais (por padrão retorna todas).
+    *   **Response:** `200 OK`
+        ```json
+        {
+          "totalIncome": 5000.00,
+          "totalExpense": 1500.00,
+          "balance": 3500.00,
+          "expensesByCategory": {
+            "Alimentação": 800.00,
+            "Lazer": 700.00
+          }
+        }
+        ```
+ 
+---
+ 
+### 6. Metas Financeiras / Orçamentos (`/api/budgets`)
+Define limites de gastos mensais por categoria.
+ 
+*   **POST `/api/budgets`**
+    *   Define ou atualiza a meta de uma categoria.
+    *   **Body:** `{ "categoryId": "<UUID>", "amountLimit": 500.00, "month": 5, "year": 2026 }`
+*   **GET `/api/budgets?month=5&year=2026`**
+    *   Lista as metas do mês junto com o cálculo automático de consumo.
+    *   **Response:** `200 OK`
+        ```json
+        [
+          {
+            "id": "...",
+            "categoryId": "...",
+            "categoryName": "Alimentação",
+            "amountLimit": 500.00,
+            "currentSpent": 450.00,
+            "percentageUsed": 90.00,
+            "isOverBudget": false,
+            "month": 5,
+            "year": 2026
+          }
+        ]
+        ```
+    *   **Nota:** O campo `isOverBudget` fica `true` automaticamente quando `percentageUsed >= 100`.
+ 
+---
+ 
+### 7. Importação e Exportação de Dados
+
+*   **GET `/api/transactions/export?month=5&year=2026`**
+    *   Exporta as transações do usuário no formato CSV. Os parâmetros `month` e `year` são opcionais.
+    *   **Response:** `200 OK`
+    *   **Headers:** `Content-Type: text/csv`, `Content-Disposition: attachment; filename=transactions.csv`
+    *   O frontend pode processar essa resposta como um Blob e iniciar o download do arquivo automaticamente.
+
+*   **POST `/api/transactions/import`**
+    *   Importa um extrato bancário nos formatos **OFX** ou **CSV**.
+    *   **Consumes:** `multipart/form-data`
+    *   **Parâmetros (Form Data):**
+        *   `file`: Arquivo `.ofx` ou `.csv`.
+        *   `walletId`: UUID da carteira de destino.
+    *   **Response:** `200 OK`
+        ```json
+        {
+          "message": "Importação realizada com sucesso.",
+          "importedTransactions": 15
+        }
+        ```
+    *   **Nota:** As transações importadas virão sem Categoria associada (`categoryId = null`). O Front-end deve sugerir ao usuário classificar essas despesas manualmente.
+
 ---
  
 ## 💡 Notas para o Frontend
@@ -129,6 +220,7 @@ Módulo social para dividir contas entre amigos ou familiares.
 2.  **Membros Virtuais:** Membros de grupo podem não ter um `userId`. O frontend deve lidar com membros que são apenas strings.
 3.  **Saldo:** A API permite saldos negativos em carteiras.
 4.  **Autenticação**: O token deve ser enviado no header `Authorization` em todas as rotas protegidas.
+5.  **Recorrência e Parcelamento:** Ao usar `installments` ou `recurringMonths` na criação de transações, a API retornará um Array com as `N` transações criadas e o saldo da carteira será impactado pelo valor de todas elas.
  
 ---
  

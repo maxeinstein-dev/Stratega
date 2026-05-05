@@ -43,7 +43,7 @@ class CreateTransactionUseCaseTest {
         Wallet wallet = new Wallet(walletId, "Main", BigDecimal.valueOf(100), UUID.randomUUID());
         
         CreateTransactionRequest request = new CreateTransactionRequest(
-                "Salário", BigDecimal.valueOf(500), LocalDateTime.now(), TransactionType.INCOME, walletId, categoryId
+                "Salário", BigDecimal.valueOf(500), LocalDateTime.now(), TransactionType.INCOME, walletId, categoryId, 1, 1
         );
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
@@ -52,7 +52,8 @@ class CreateTransactionUseCaseTest {
             return new Transaction(UUID.randomUUID(), t.getDescription(), t.getAmount(), t.getDate(), t.getType(), t.getWalletId(), t.getCategoryId(), null);
         });
 
-        TransactionResponse response = createTransactionUseCase.execute(request);
+        java.util.List<TransactionResponse> responses = createTransactionUseCase.execute(request);
+        TransactionResponse response = responses.get(0);
 
         assertNotNull(response.id());
         assertEquals("Salário", response.description());

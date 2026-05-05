@@ -8,7 +8,6 @@ import br.com.maxsueleinstein.stratega.domain.model.Wallet;
 import br.com.maxsueleinstein.stratega.domain.repository.TransactionRepository;
 import br.com.maxsueleinstein.stratega.domain.repository.WalletRepository;
 import br.com.maxsueleinstein.stratega.presentation.exception.ForbiddenException;
-import br.com.maxsueleinstein.stratega.presentation.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,12 +46,13 @@ class UpdateTransactionUseCaseImplTest {
     @DisplayName("Deve atualizar uma despesa simples e ajustar os saldos corretamente")
     void shouldUpdateSimpleExpense() {
         UUID transactionId = UUID.randomUUID();
-        // O valor antigo é 100, então a carteira estaria com 100 a menos do que se não houvesse despesa.
-        Transaction expense = new Transaction(transactionId, "Old Desc", new BigDecimal("100.00"), LocalDateTime.now(), TransactionType.EXPENSE, walletId, null, null);
+        // O valor antigo é 100, então a carteira estaria com 100 a menos do que se não
+        // houvesse despesa.
+        Transaction expense = new Transaction(transactionId, "Old Desc", new BigDecimal("100.00"), LocalDateTime.now(),
+                TransactionType.EXPENSE, walletId, null, null);
 
         UpdateTransactionRequest request = new UpdateTransactionRequest(
-                "New Desc", new BigDecimal("150.00"), LocalDateTime.now(), walletId, null
-        );
+                "New Desc", new BigDecimal("150.00"), LocalDateTime.now(), walletId, null);
 
         when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(expense));
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
@@ -63,9 +63,10 @@ class UpdateTransactionUseCaseImplTest {
         assertEquals("New Desc", response.description());
         assertEquals(new BigDecimal("150.00"), response.amount());
 
-        // A carteira tinha 1000. Reverte a despesa de 100 (+100) = 1100. Aplica a nova de 150 (-150) = 950.
+        // A carteira tinha 1000. Reverte a despesa de 100 (+100) = 1100. Aplica a nova
+        // de 150 (-150) = 950.
         assertEquals(new BigDecimal("950.00"), wallet.getBalance());
-        
+
         verify(walletRepository).save(wallet);
         verify(transactionRepository).save(expense);
     }
@@ -74,11 +75,11 @@ class UpdateTransactionUseCaseImplTest {
     @DisplayName("Deve impedir atualização se o usuário não for dono da carteira")
     void shouldForbidUpdateIfUserIsNotOwner() {
         UUID transactionId = UUID.randomUUID();
-        Transaction expense = new Transaction(transactionId, "Old Desc", new BigDecimal("100.00"), LocalDateTime.now(), TransactionType.EXPENSE, walletId, null, null);
-        
+        Transaction expense = new Transaction(transactionId, "Old Desc", new BigDecimal("100.00"), LocalDateTime.now(),
+                TransactionType.EXPENSE, walletId, null, null);
+
         UpdateTransactionRequest request = new UpdateTransactionRequest(
-                "New Desc", new BigDecimal("150.00"), LocalDateTime.now(), walletId, null
-        );
+                "New Desc", new BigDecimal("150.00"), LocalDateTime.now(), walletId, null);
 
         when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(expense));
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
@@ -94,17 +95,18 @@ class UpdateTransactionUseCaseImplTest {
         UUID primaryTxId = UUID.randomUUID();
         UUID linkedTxId = UUID.randomUUID();
         UUID destWalletId = UUID.randomUUID();
-        
+
         Wallet destWallet = new Wallet(destWalletId, "Dest Wallet", new BigDecimal("500.00"), userId);
 
         // O valor antigo da transferência é 200
-        Transaction transferOut = new Transaction(primaryTxId, "Transfer OUT", new BigDecimal("200.00"), LocalDateTime.now(), TransactionType.TRANSFER_OUT, walletId, null, linkedTxId);
-        Transaction transferIn = new Transaction(linkedTxId, "Transfer IN", new BigDecimal("200.00"), LocalDateTime.now(), TransactionType.TRANSFER_IN, destWalletId, null, primaryTxId);
+        Transaction transferOut = new Transaction(primaryTxId, "Transfer OUT", new BigDecimal("200.00"),
+                LocalDateTime.now(), TransactionType.TRANSFER_OUT, walletId, null, linkedTxId);
+        Transaction transferIn = new Transaction(linkedTxId, "Transfer IN", new BigDecimal("200.00"),
+                LocalDateTime.now(), TransactionType.TRANSFER_IN, destWalletId, null, primaryTxId);
 
         // Novo valor será 300
         UpdateTransactionRequest request = new UpdateTransactionRequest(
-                "Transferência Atualizada", new BigDecimal("300.00"), LocalDateTime.now(), walletId, null
-        );
+                "Transferência Atualizada", new BigDecimal("300.00"), LocalDateTime.now(), walletId, null);
 
         when(transactionRepository.findById(primaryTxId)).thenReturn(Optional.of(transferOut));
         when(transactionRepository.findById(linkedTxId)).thenReturn(Optional.of(transferIn));
@@ -117,12 +119,13 @@ class UpdateTransactionUseCaseImplTest {
         assertEquals("Transferência Atualizada", response.description());
         assertEquals(new BigDecimal("300.00"), response.amount());
 
-        // Wallet Origem: tinha 1000. Reverte 200 (+200) = 1200. Aplica 300 (-300) = 900.
+        // Wallet Origem: tinha 1000. Reverte 200 (+200) = 1200. Aplica 300 (-300) =
+        // 900.
         assertEquals(new BigDecimal("900.00"), wallet.getBalance());
-        
+
         // Wallet Destino: tinha 500. Reverte 200 (-200) = 300. Aplica 300 (+300) = 600.
         assertEquals(new BigDecimal("600.00"), destWallet.getBalance());
-        
+
         verify(walletRepository).save(wallet);
         verify(walletRepository).save(destWallet);
         verify(transactionRepository).save(transferOut);

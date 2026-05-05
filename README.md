@@ -90,10 +90,19 @@ stratega
 - [x] Endpoints de Listagem para alimentar painéis Front-End (GET Wallets, Transactions, Groups).
 - [x] Gestão de Wallets com atualização de saldo em tempo real (suporta saldo negativo).
 - [x] Transações Editáveis: Ajuste de valores, datas, categorias e transferências com dupla reversão de saldo.
+- [x] Lançamentos Recorrentes e Parcelamentos: Criação de múltiplas transações futuras.
 - [x] Transferências entre carteiras com transações vinculadas.
 - [x] Módulo de Despesas em Grupo com 4 tipos de split e tracking de datas e permissões de acesso.
 - [x] Algoritmo de liquidação de dívidas (Suggested Transfers).
+- [x] Dashboard Analítico: Resumo mensal de receitas, despesas e gastos agrupados por categoria.
+- [x] Metas Financeiras (Budgets): Definição de limite mensal por categoria com cálculo de % de consumo e flag `isOverBudget`.
+- [x] Exportação de Transações em CSV e Importação de Arquivos OFX e CSV.
+- [x] Exclusão de Transações com Reconciliação Automática de Saldo.
+- [x] Refatoração de Transferências para Agregado Único com Exclusão Atômica.
+- [x] Liquidação de Grupo com Injeção de Saldo em Carteiras Reais.
+- [x] Soft Delete de Carteiras e Proteção de Categorias Globais.
 - [x] Tratamento de Erros Padronizados Globais (400, 403, 404).
+- [x] Suporte a Docker e Banco de Dados PostgreSQL (Ambiente de Produção).
 - [x] Cobertura de testes superior a 90% nas regras críticas.
 
 ---

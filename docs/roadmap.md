@@ -58,19 +58,45 @@ Garantindo liberdade e fluidez para a experiência do usuário.
 
 ---
 
+## 🚀 Módulo 5 - Inteligência de Dados e Produção (Concluído)
+
+Foco em prover insights financeiros e preparar a aplicação para um ambiente de produção real.
+
+- **Dashboard Analítico:** Agrupamentos por categoria, balanço mensal, total de receitas e despesas.
+- **Metas Financeiras (Budgets):** Definição de limites de gastos mensais por categoria com cálculo automático de percentual de consumo.
+- **Lançamentos Recorrentes e Parcelamentos:** Suporte à criação em lote de transações futuras deduzindo o "saldo projetado" da carteira.
+- **Exportação de Dados:** Geração de relatórios financeiros em formato `.csv`.
+- **Importação de Dados:** Leitura de faturas e histórico bancário via extratos `.ofx`.
+- **Ambiente de Produção (Docker + PostgreSQL):** Criação de `Dockerfile` otimizado, `docker-compose.yml` e `application-prod.properties` para deploy.
+
+---
+
+## 🔐 Módulo 6 - Integridade, Exclusões e Social Settlement (Concluído)
+
+Foco em garantir a precisão matemática absoluta e facilitar acertos de contas.
+
+- **Exclusão de Transações com Reconciliação:** Deletar uma transação reverte automaticamente o saldo da carteira (US07).
+- **Transferências de Unidade Única:** Refatoração de transferências para um agregado (`Transfer`) que permite exclusão atômica de ambas as carteiras (US05).
+- **Liquidação de Grupo com Injeção de Saldo:** Endpoint para liquidar dívidas de grupo que injeta o dinheiro diretamente em uma carteira do mundo real (US08).
+- **Importação Multi-formato:** Suporte a arquivos `.csv` e `.ofx` para facilitar a migração de outros apps.
+- **Soft Delete de Carteiras:** Bloqueio de exclusão física para carteiras com histórico, permitindo apenas o arquivamento para preservar relatórios passados.
+- **Segurança em Categorias:** Proteção contra edição de categorias globais e deleção de categorias em uso.
+
+---
+
 ## 🔮 Backlog de Expansão (Implementações Futuras)
 
 As próximas funcionalidades a serem implementadas no backend à medida que o projeto crescer:
 
-1. **Dashboard Analítico**
-   - Agrupamentos por categoria, balanço mensal, despesas vs receitas (SQL otimizado ou paginação).
-2. **Metas Financeiras**
-   - Limites de gastos (orçamentos mensais) com alerta de estouro de teto.
-3. **Lançamentos Recorrentes / Parcelamentos**
-   - Regras de repetição para despesas fixas ou suporte à divisão automática do saldo por meses.
-4. **Anexos**
-   - Upload de imagem/PDF para comprovantes.
-5. **Conciliação Bancária**
-   - Marcar transações como `PENDING` ou `SETTLED`.
-6. **Importação/Exportação**
-   - CSV ou conexão Open Finance no futuro.
+1. **Anexos**
+   - Upload de imagem/PDF para comprovantes e notas fiscais (Integração com AWS S3 ou armazenamento local).
+2. **Conciliação Bancária**
+   - Marcar transações como `PENDING` ou `SETTLED` para controle mais rígido.
+3. **Integração Open Finance**
+   - Conexão com APIs bancárias reais para leitura automática de extratos.
+4. **Notificações (Push / Webhook)**
+   - Alertas de "Meta Financeira Atingida" ou "Boleto Vencendo Hoje".
+5. **Multi-Moedas e Câmbio**
+   - Suporte a carteiras em Dólar/Euro com conversão em tempo real.
+6. **Insights com IA**
+   - Dicas automáticas de economia baseadas no padrão de consumo do usuário.
