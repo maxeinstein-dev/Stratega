@@ -19,11 +19,13 @@ public class FindWalletsByUserIdUseCaseImpl implements FindWalletsByUserIdUseCas
     @Override
     public List<WalletResponse> execute(UUID userId) {
         return walletRepository.findByUserId(userId).stream()
+                .filter(br.com.maxsueleinstein.stratega.domain.model.Wallet::isActive)
                 .map(wallet -> new WalletResponse(
                         wallet.getId(),
                         wallet.getName(),
                         wallet.getBalance(),
-                        wallet.getUserId()
+                        wallet.getUserId(),
+                        wallet.isActive()
                 ))
                 .collect(Collectors.toList());
     }

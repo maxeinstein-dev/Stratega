@@ -5,5 +5,5 @@ import java.util.List;
 import java.util.UUID;
  
 public interface FindTransactionsByUserIdUseCase {
-    List<TransactionResponse> execute(UUID userId);
+    List<TransactionResponse> execute(UUID userId, Integer month, Integer year);
 }

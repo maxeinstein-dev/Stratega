@@ -17,12 +17,20 @@ public class FindTransactionsByUserIdUseCaseImpl implements FindTransactionsByUs
     }
  
     @Override
-    public List<TransactionResponse> execute(UUID userId) {
+    public List<TransactionResponse> execute(UUID userId, Integer month, Integer year) {
         return transactionRepository.findByUserId(userId).stream()
+                .filter(tx -> {
+                    if (month == null && year == null) return true;
+                    if (tx.getDate() == null) return false;
+                    boolean matchMonth = month == null || tx.getDate().getMonthValue() == month;
+                    boolean matchYear = year == null || tx.getDate().getYear() == year;
+                    return matchMonth && matchYear;
+                })
                 .map(tx -> new TransactionResponse(
                         tx.getId(),
                         tx.getDescription(),
                         tx.getAmount(),
+                        tx.getNetAmount(),
                         tx.getDate(),
                         tx.getType(),
                         tx.getWalletId(),

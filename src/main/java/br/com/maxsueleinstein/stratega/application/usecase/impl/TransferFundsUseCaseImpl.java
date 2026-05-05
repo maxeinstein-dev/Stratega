@@ -14,13 +14,16 @@ public class TransferFundsUseCaseImpl implements TransferFundsUseCase {
 
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
+    private final br.com.maxsueleinstein.stratega.domain.repository.TransferRepository transferRepository;
 
-    public TransferFundsUseCaseImpl(WalletRepository walletRepository, TransactionRepository transactionRepository) {
+    public TransferFundsUseCaseImpl(WalletRepository walletRepository, TransactionRepository transactionRepository, br.com.maxsueleinstein.stratega.domain.repository.TransferRepository transferRepository) {
         this.walletRepository = walletRepository;
         this.transactionRepository = transactionRepository;
+        this.transferRepository = transferRepository;
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public void execute(TransferFundsRequest request) {
         if (request.originWalletId().equals(request.destinationWalletId())) {
             throw new IllegalArgumentException("As carteiras de origem e destino devem ser diferentes");
@@ -43,6 +46,7 @@ public class TransferFundsUseCaseImpl implements TransferFundsUseCase {
                 outTransactionId,
                 request.description(),
                 request.amount(),
+                null, // netAmount
                 request.date(),
                 TransactionType.TRANSFER_OUT,
                 request.originWalletId(),
@@ -54,6 +58,7 @@ public class TransferFundsUseCaseImpl implements TransferFundsUseCase {
                 inTransactionId,
                 request.description(),
                 request.amount(),
+                null, // netAmount
                 request.date(),
                 TransactionType.TRANSFER_IN,
                 request.destinationWalletId(),
@@ -61,9 +66,22 @@ public class TransferFundsUseCaseImpl implements TransferFundsUseCase {
                 outTransactionId
         );
 
+        br.com.maxsueleinstein.stratega.domain.model.Transfer transfer = new br.com.maxsueleinstein.stratega.domain.model.Transfer(
+                UUID.randomUUID(),
+                originWallet.getUserId(),
+                request.originWalletId(),
+                request.destinationWalletId(),
+                request.amount(),
+                request.description(),
+                request.date(),
+                outTransactionId,
+                inTransactionId
+        );
+
         walletRepository.save(originWallet);
         walletRepository.save(destinationWallet);
         transactionRepository.save(outTransaction);
         transactionRepository.save(inTransaction);
+        transferRepository.save(transfer);
     }
 }

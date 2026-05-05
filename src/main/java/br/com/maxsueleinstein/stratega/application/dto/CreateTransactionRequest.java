@@ -12,5 +12,7 @@ public record CreateTransactionRequest(
         LocalDateTime date,
         TransactionType type,
         UUID walletId,
-        UUID categoryId
+        UUID categoryId,
+        Integer installments,
+        Integer recurringMonths
 ) {}

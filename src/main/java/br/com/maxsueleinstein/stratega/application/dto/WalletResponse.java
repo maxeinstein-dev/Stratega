@@ -7,5 +7,6 @@ public record WalletResponse(
         UUID id,
         String name,
         BigDecimal balance,
-        UUID userId
+        UUID userId,
+        boolean active
 ) {}

@@ -22,7 +22,8 @@ public class CreateWalletUseCaseImpl implements CreateWalletUseCase {
                 savedWallet.getId(),
                 savedWallet.getName(),
                 savedWallet.getBalance(),
-                savedWallet.getUserId()
+                savedWallet.getUserId(),
+                savedWallet.isActive()
         );
     }
 }
