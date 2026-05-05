@@ -55,6 +55,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
 
             if (response != null && "success".equals(response.get("result"))) {
+                @SuppressWarnings("unchecked")
                 Map<String, Object> rates = (Map<String, Object>) response.get("conversion_rates");
                 Object rateObj = rates.get(to.name());
                 

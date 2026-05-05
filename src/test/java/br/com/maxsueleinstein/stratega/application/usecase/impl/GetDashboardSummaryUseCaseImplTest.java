@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -24,13 +25,21 @@ class GetDashboardSummaryUseCaseImplTest {
 
     private TransactionRepository transactionRepository;
     private CategoryRepository categoryRepository;
+    private br.com.maxsueleinstein.stratega.domain.repository.WalletRepository walletRepository;
+    private br.com.maxsueleinstein.stratega.domain.service.ExchangeRateService exchangeRateService;
     private GetDashboardSummaryUseCaseImpl useCase;
 
     @BeforeEach
     void setUp() {
         transactionRepository = mock(TransactionRepository.class);
         categoryRepository = mock(CategoryRepository.class);
-        useCase = new GetDashboardSummaryUseCaseImpl(transactionRepository, categoryRepository);
+        walletRepository = mock(br.com.maxsueleinstein.stratega.domain.repository.WalletRepository.class);
+        exchangeRateService = mock(br.com.maxsueleinstein.stratega.domain.service.ExchangeRateService.class);
+        
+        // Default mock behavior for currency conversion (identity)
+        when(exchangeRateService.convert(any(BigDecimal.class), any(), any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        useCase = new GetDashboardSummaryUseCaseImpl(transactionRepository, categoryRepository, walletRepository, exchangeRateService);
     }
 
     @Test
@@ -43,10 +52,14 @@ class GetDashboardSummaryUseCaseImplTest {
         when(categoryRepository.findById(catFoodId)).thenReturn(Optional.of(new Category(catFoodId, "Alimentação", br.com.maxsueleinstein.stratega.domain.model.CategoryType.EXPENSE, userId)));
         when(categoryRepository.findById(catFunId)).thenReturn(Optional.of(new Category(catFunId, "Lazer", br.com.maxsueleinstein.stratega.domain.model.CategoryType.EXPENSE, userId)));
 
-        Transaction income = new Transaction(UUID.randomUUID(), "Salario", new BigDecimal("5000.00"), LocalDateTime.of(2026, 5, 10, 0, 0), TransactionType.INCOME, UUID.randomUUID(), null, null);
-        Transaction expense1 = new Transaction(UUID.randomUUID(), "Mercado", new BigDecimal("800.00"), LocalDateTime.of(2026, 5, 15, 0, 0), TransactionType.EXPENSE, UUID.randomUUID(), catFoodId, null);
-        Transaction expense2 = new Transaction(UUID.randomUUID(), "Cinema", new BigDecimal("200.00"), LocalDateTime.of(2026, 5, 20, 0, 0), TransactionType.EXPENSE, UUID.randomUUID(), catFunId, null);
-        Transaction outOfMonth = new Transaction(UUID.randomUUID(), "Fora do mes", new BigDecimal("100.00"), LocalDateTime.of(2026, 6, 1, 0, 0), TransactionType.EXPENSE, UUID.randomUUID(), catFunId, null);
+        UUID walletId = UUID.randomUUID();
+        br.com.maxsueleinstein.stratega.domain.model.Wallet wallet = new br.com.maxsueleinstein.stratega.domain.model.Wallet(walletId, "Wallet", BigDecimal.ZERO, userId);
+        when(walletRepository.findByUserId(userId)).thenReturn(List.of(wallet));
+
+        Transaction income = new Transaction(UUID.randomUUID(), "Salario", new BigDecimal("5000.00"), LocalDateTime.of(2026, 5, 10, 0, 0), TransactionType.INCOME, walletId, null, null);
+        Transaction expense1 = new Transaction(UUID.randomUUID(), "Mercado", new BigDecimal("800.00"), LocalDateTime.of(2026, 5, 15, 0, 0), TransactionType.EXPENSE, walletId, catFoodId, null);
+        Transaction expense2 = new Transaction(UUID.randomUUID(), "Cinema", new BigDecimal("200.00"), LocalDateTime.of(2026, 5, 20, 0, 0), TransactionType.EXPENSE, walletId, catFunId, null);
+        Transaction outOfMonth = new Transaction(UUID.randomUUID(), "Fora do mes", new BigDecimal("100.00"), LocalDateTime.of(2026, 6, 1, 0, 0), TransactionType.EXPENSE, walletId, catFunId, null);
 
         when(transactionRepository.findByUserId(userId)).thenReturn(List.of(income, expense1, expense2, outOfMonth));
 

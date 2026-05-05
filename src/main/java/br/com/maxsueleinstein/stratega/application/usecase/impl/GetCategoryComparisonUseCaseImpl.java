@@ -3,7 +3,6 @@ package br.com.maxsueleinstein.stratega.application.usecase.impl;
 import br.com.maxsueleinstein.stratega.application.usecase.GetCategoryComparisonUseCase;
 import br.com.maxsueleinstein.stratega.domain.model.Category;
 import br.com.maxsueleinstein.stratega.domain.model.Currency;
-import br.com.maxsueleinstein.stratega.domain.model.Transaction;
 import br.com.maxsueleinstein.stratega.domain.model.Wallet;
 import br.com.maxsueleinstein.stratega.domain.repository.CategoryRepository;
 import br.com.maxsueleinstein.stratega.domain.repository.TransactionRepository;
@@ -14,7 +13,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -27,9 +25,9 @@ public class GetCategoryComparisonUseCaseImpl implements GetCategoryComparisonUs
     private final ExchangeRateService exchangeRateService;
 
     public GetCategoryComparisonUseCaseImpl(TransactionRepository transactionRepository,
-                                          CategoryRepository categoryRepository,
-                                          WalletRepository walletRepository,
-                                          ExchangeRateService exchangeRateService) {
+            CategoryRepository categoryRepository,
+            WalletRepository walletRepository,
+            ExchangeRateService exchangeRateService) {
         this.transactionRepository = transactionRepository;
         this.categoryRepository = categoryRepository;
         this.walletRepository = walletRepository;
@@ -48,7 +46,7 @@ public class GetCategoryComparisonUseCaseImpl implements GetCategoryComparisonUs
         Map<String, BigDecimal> previousTotals = calculateTotalsForMonth(userId, previousMonthStart, walletCurrencies);
 
         Map<String, ComparisonData> result = new HashMap<>();
-        
+
         currentTotals.forEach((category, currentAmount) -> {
             BigDecimal previousAmount = previousTotals.getOrDefault(category, BigDecimal.ZERO);
             BigDecimal diffPercent = calculateDifference(currentAmount, previousAmount);
@@ -65,7 +63,8 @@ public class GetCategoryComparisonUseCaseImpl implements GetCategoryComparisonUs
         return result;
     }
 
-    private Map<String, BigDecimal> calculateTotalsForMonth(UUID userId, LocalDate start, Map<UUID, Currency> walletCurrencies) {
+    private Map<String, BigDecimal> calculateTotalsForMonth(UUID userId, LocalDate start,
+            Map<UUID, Currency> walletCurrencies) {
         int month = start.getMonthValue();
         int year = start.getYear();
 
@@ -75,13 +74,13 @@ public class GetCategoryComparisonUseCaseImpl implements GetCategoryComparisonUs
                         tx.getDate().getYear() == year &&
                         tx.getCategoryId() != null)
                 .collect(Collectors.groupingBy(
-                        tx -> categoryRepository.findById(tx.getCategoryId()).map(Category::getName).orElse("Desconhecida"),
-                        Collectors.reducing(BigDecimal.ZERO, 
-                                tx -> exchangeRateService.convert(tx.getEffectiveAmount(), 
-                                        walletCurrencies.getOrDefault(tx.getWalletId(), Currency.BRL), 
-                                        Currency.BRL), 
-                                BigDecimal::add)
-                ));
+                        tx -> categoryRepository.findById(tx.getCategoryId()).map(Category::getName)
+                                .orElse("Desconhecida"),
+                        Collectors.reducing(BigDecimal.ZERO,
+                                tx -> exchangeRateService.convert(tx.getEffectiveAmount(),
+                                        walletCurrencies.getOrDefault(tx.getWalletId(), Currency.BRL),
+                                        Currency.BRL),
+                                BigDecimal::add)));
     }
 
     private BigDecimal calculateDifference(BigDecimal current, BigDecimal previous) {

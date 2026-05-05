@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/dashboard")
@@ -28,8 +27,8 @@ public class DashboardController {
     private final GetCategoryComparisonUseCase getCategoryComparisonUseCase;
 
     public DashboardController(GetDashboardSummaryUseCase getDashboardSummaryUseCase,
-                              GetSpendingTrendUseCase getSpendingTrendUseCase,
-                              GetCategoryComparisonUseCase getCategoryComparisonUseCase) {
+            GetSpendingTrendUseCase getSpendingTrendUseCase,
+            GetCategoryComparisonUseCase getCategoryComparisonUseCase) {
         this.getDashboardSummaryUseCase = getDashboardSummaryUseCase;
         this.getSpendingTrendUseCase = getSpendingTrendUseCase;
         this.getCategoryComparisonUseCase = getCategoryComparisonUseCase;
@@ -41,7 +40,7 @@ public class DashboardController {
             @AuthenticationPrincipal User user,
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) Integer year) {
-        
+
         DashboardSummaryResponse response = getDashboardSummaryUseCase.execute(user.getId(), month, year);
         return ResponseEntity.ok(response);
     }

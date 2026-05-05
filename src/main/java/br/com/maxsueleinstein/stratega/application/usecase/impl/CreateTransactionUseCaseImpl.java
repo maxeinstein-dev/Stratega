@@ -107,8 +107,8 @@ public class CreateTransactionUseCaseImpl implements CreateTransactionUseCase {
         int month = transaction.getDate().getMonthValue();
         int year = transaction.getDate().getYear();
 
-        Optional<Budget> budgetOpt = budgetRepository.findByCategoryAndMonthAndYear(
-                transaction.getCategoryId(), month, year);
+        Optional<Budget> budgetOpt = budgetRepository.findByUserIdAndCategoryIdAndMonthAndYear(
+                userId, transaction.getCategoryId(), month, year);
 
         if (budgetOpt.isPresent()) {
             Budget budget = budgetOpt.get();

@@ -75,17 +75,17 @@ Foco em prover insights financeiros e preparar a aplicação para um ambiente de
 
 Foco em garantir a precisão matemática absoluta e facilitar acertos de contas.
 
-- **Exclusão de Transações com Reconciliação:** Deletar uma transação reverte automaticamente o saldo da carteira (US07).
-- **Transferências de Unidade Única:** Refatoração de transferências para um agregado (`Transfer`) que permite exclusão atômica de ambas as carteiras (US05).
-- **Liquidação de Grupo com Injeção de Saldo:** Endpoint para liquidar dívidas de grupo que injeta o dinheiro diretamente em uma carteira do mundo real (US08).
+- **Exclusão de Transações com Reconciliação:** Deletar uma transação reverte automaticamente o saldo da carteira.
+- **Transferências de Unidade Única:** Refatoração de transferências para um agregado (`Transfer`) que permite exclusão atômica de ambas as carteiras.
+- **Liquidação de Grupo com Injeção de Saldo:** Endpoint para liquidar dívidas de grupo que injeta o dinheiro diretamente em uma carteira do mundo real.
 - **Importação Multi-formato:** Suporte a arquivos `.csv` e `.ofx` para facilitar a migração de outros apps.
 - **Soft Delete de Carteiras:** Bloqueio de exclusão física para carteiras com histórico, permitindo apenas o arquivamento para preservar relatórios passados.
 - **Segurança em Categorias:** Proteção contra edição de categorias globais e deleção de categorias em uso.
 
 ### Módulo 7: Globalização e Engajamento ✅
-- **Globalização (Multi-Moedas):** Suporte a carteiras em USD/EUR com conversão automática via ExchangeRate-API (US16).
-- **Notificações Inteligentes:** Sistema de alertas in-app para orçamentos atingidos (US17).
-- **Relatórios Avançados:** Gráficos de tendência e comparativos mensais (US18).
+- **Globalização (Multi-Moedas):** Suporte a carteiras em USD/EUR com conversão automática via ExchangeRate-API.
+- **Notificações Inteligentes:** Sistema de alertas in-app para orçamentos atingidos.
+- **Relatórios Avançados:** Gráficos de tendência e comparativos mensais.
 
 ---
 

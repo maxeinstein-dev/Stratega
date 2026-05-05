@@ -1,6 +1,7 @@
 package br.com.maxsueleinstein.stratega.presentation.controller;
  
 import br.com.maxsueleinstein.stratega.application.dto.CreateWalletRequest;
+import br.com.maxsueleinstein.stratega.domain.model.Currency;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ public class WalletControllerIntegrationTest {
 
     @Test
     void shouldCreateWalletAndReturnCreatedStatus() throws Exception {
-        CreateWalletRequest request = new CreateWalletRequest("Carteira Viagem", BigDecimal.valueOf(100), UUID.randomUUID());
+        CreateWalletRequest request = new CreateWalletRequest("Carteira Viagem", BigDecimal.valueOf(100), UUID.randomUUID(), Currency.BRL);
 
         mockMvc.perform(post("/api/wallets")
                 .contentType(MediaType.APPLICATION_JSON)

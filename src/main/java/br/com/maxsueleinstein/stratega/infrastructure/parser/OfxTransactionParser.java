@@ -78,7 +78,8 @@ public class OfxTransactionParser implements TransactionParser {
 
     private LocalDateTime parseDate(String dateStr) {
         try {
-            // OFX Date format is usually YYYYMMDDHHMMSS.XXX[gmt offset:tz name]
+            // OFX Date format is usually YYYYMMDDHHMMSS.SSS[gmt offset:tz name]
+            // where SSS is milliseconds and gmt offset is the timezone offset.
             // We just extract the first 14 characters YYYYMMDDHHMMSS
             if (dateStr.length() >= 14) {
                 String cleanDate = dateStr.substring(0, 14);
