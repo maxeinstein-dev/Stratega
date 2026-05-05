@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Stratega Data ###
+*.ofx
+Stratega_Backlog_Completo-v3.md
