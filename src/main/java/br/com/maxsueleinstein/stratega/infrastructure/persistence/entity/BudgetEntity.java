@@ -1,5 +1,6 @@
 package br.com.maxsueleinstein.stratega.infrastructure.persistence.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -23,6 +24,9 @@ public class BudgetEntity {
     private UUID userId;
     private UUID categoryId;
     private BigDecimal amountLimit;
+    @Column(name = "`month`")
     private int month;
+
+    @Column(name = "`year`")
     private int year;
 }

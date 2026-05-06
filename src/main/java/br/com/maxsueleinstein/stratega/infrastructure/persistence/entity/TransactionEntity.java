@@ -35,4 +35,5 @@ public class TransactionEntity {
     private UUID walletId;
     private UUID categoryId;
     private UUID linkedTransactionId;
+    private UUID groupId;
 }

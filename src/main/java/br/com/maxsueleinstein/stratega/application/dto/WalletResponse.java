@@ -11,5 +11,6 @@ public record WalletResponse(
         BigDecimal balance,
         UUID userId,
         Currency currency,
-        boolean active
+        boolean active,
+        boolean allowNegativeBalance
 ) {}

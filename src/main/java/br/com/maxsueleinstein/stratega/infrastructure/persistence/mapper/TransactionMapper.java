@@ -16,7 +16,8 @@ public class TransactionMapper {
                 entity.getType(),
                 entity.getWalletId(),
                 entity.getCategoryId(),
-                entity.getLinkedTransactionId()
+                entity.getLinkedTransactionId(),
+                entity.getGroupId()
         );
     }
 
@@ -32,6 +33,7 @@ public class TransactionMapper {
                 .walletId(domain.getWalletId())
                 .categoryId(domain.getCategoryId())
                 .linkedTransactionId(domain.getLinkedTransactionId())
+                .groupId(domain.getGroupId())
                 .build();
     }
 }

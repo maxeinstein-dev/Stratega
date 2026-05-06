@@ -64,7 +64,8 @@ public class SettleGroupDebtUseCaseImpl implements SettleGroupDebtUseCase {
                                 LocalDateTime.now(),
                                 List.of(new br.com.maxsueleinstein.stratega.domain.model.split.ExactSplit(receiver,
                                                 request.amount())),
-                                null // Sem estratégia, split manual
+                                null, // Sem estratégia, split manual
+                                "SETTLEMENT"
                 );
                 group.addExpense(settlementExpense);
                 groupRepository.save(group);

@@ -54,6 +54,10 @@ public class ImportTransactionsUseCaseImpl implements ImportTransactionsUseCase 
         try {
             List<Transaction> transactions = parser.parse(file.getInputStream(), walletId);
 
+            if (transactions.isEmpty()) {
+                throw new IllegalArgumentException("Nenhuma transação encontrada no arquivo. Verifique se o arquivo possui dados válidos.");
+            }
+
             for (Transaction tx : transactions) {
                 if (tx.isIncome()) {
                     wallet.addFunds(tx.getAmount());
@@ -66,8 +70,17 @@ public class ImportTransactionsUseCaseImpl implements ImportTransactionsUseCase 
             walletRepository.save(wallet);
 
             return transactions.size();
+        } catch (IllegalArgumentException e) {
+            // Regras de negócio ou dados inválidos no arquivo — repassar mensagem ao usuário
+            throw e;
+        } catch (java.io.IOException e) {
+            // Falha ao ler o arquivo (corrompido, stream fechada, etc.)
+            throw new IllegalArgumentException("Não foi possível ler o arquivo enviado. Certifique-se de que o arquivo não está corrompido e tente novamente.", e);
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao processar a importação: " + e.getMessage(), e);
+            // Falha inesperada — registrar internamente sem expor detalhes técnicos
+            throw new IllegalArgumentException(
+                    "Erro inesperado ao processar o arquivo '" + file.getOriginalFilename() + "'. " +
+                    "Verifique se o formato está correto (" + (file.getOriginalFilename() != null && file.getOriginalFilename().endsWith(".csv") ? "CSV" : "OFX") + ") e tente novamente.", e);
         }
     }
 }

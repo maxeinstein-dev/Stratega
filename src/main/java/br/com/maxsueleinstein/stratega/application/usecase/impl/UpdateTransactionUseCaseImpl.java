@@ -148,6 +148,7 @@ public class UpdateTransactionUseCaseImpl implements UpdateTransactionUseCase {
                 savedTransaction.getType(),
                 savedTransaction.getWalletId(),
                 savedTransaction.getCategoryId(),
-                savedTransaction.getLinkedTransactionId());
+                savedTransaction.getLinkedTransactionId(),
+                savedTransaction.getGroupId());
     }
 }

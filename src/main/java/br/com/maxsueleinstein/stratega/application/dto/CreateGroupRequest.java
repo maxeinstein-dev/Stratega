@@ -6,5 +6,6 @@ import java.util.UUID;
 public record CreateGroupRequest(
     String name,
     UUID ownerId,
-    List<String> memberNames // Membros iniciais (virtuais ou não, aqui simplificaremos para nomes)
+    String ownerName,
+    List<String> memberNames
 ) {}

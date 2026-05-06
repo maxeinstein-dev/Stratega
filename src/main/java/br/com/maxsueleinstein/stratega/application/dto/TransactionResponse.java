@@ -15,5 +15,6 @@ public record TransactionResponse(
         TransactionType type,
         UUID walletId,
         UUID categoryId,
-        UUID linkedTransactionId
+        UUID linkedTransactionId,
+        UUID groupId
 ) {}

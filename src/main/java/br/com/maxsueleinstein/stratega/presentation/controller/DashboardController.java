@@ -1,9 +1,11 @@
 package br.com.maxsueleinstein.stratega.presentation.controller;
 
 import br.com.maxsueleinstein.stratega.application.dto.DashboardSummaryResponse;
+import br.com.maxsueleinstein.stratega.application.dto.HistoricalSummaryResponse;
 import br.com.maxsueleinstein.stratega.application.dto.SpendingTrendResponse;
 import br.com.maxsueleinstein.stratega.application.usecase.GetCategoryComparisonUseCase;
 import br.com.maxsueleinstein.stratega.application.usecase.GetDashboardSummaryUseCase;
+import br.com.maxsueleinstein.stratega.application.usecase.GetHistoricalSummaryUseCase;
 import br.com.maxsueleinstein.stratega.application.usecase.GetSpendingTrendUseCase;
 import br.com.maxsueleinstein.stratega.domain.model.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,13 +27,16 @@ public class DashboardController {
     private final GetDashboardSummaryUseCase getDashboardSummaryUseCase;
     private final GetSpendingTrendUseCase getSpendingTrendUseCase;
     private final GetCategoryComparisonUseCase getCategoryComparisonUseCase;
+    private final GetHistoricalSummaryUseCase getHistoricalSummaryUseCase;
 
     public DashboardController(GetDashboardSummaryUseCase getDashboardSummaryUseCase,
             GetSpendingTrendUseCase getSpendingTrendUseCase,
-            GetCategoryComparisonUseCase getCategoryComparisonUseCase) {
+            GetCategoryComparisonUseCase getCategoryComparisonUseCase,
+            GetHistoricalSummaryUseCase getHistoricalSummaryUseCase) {
         this.getDashboardSummaryUseCase = getDashboardSummaryUseCase;
         this.getSpendingTrendUseCase = getSpendingTrendUseCase;
         this.getCategoryComparisonUseCase = getCategoryComparisonUseCase;
+        this.getHistoricalSummaryUseCase = getHistoricalSummaryUseCase;
     }
 
     @GetMapping("/summary")
@@ -61,5 +66,13 @@ public class DashboardController {
             @RequestParam int month,
             @RequestParam int year) {
         return ResponseEntity.ok(getCategoryComparisonUseCase.execute(user.getId(), month, year));
+    }
+
+    @GetMapping("/historical")
+    @Operation(summary = "Resumo histórico de receitas, despesas e poupança")
+    public ResponseEntity<HistoricalSummaryResponse> getHistorical(
+            @AuthenticationPrincipal User user,
+            @RequestParam(defaultValue = "180") int days) {
+        return ResponseEntity.ok(getHistoricalSummaryUseCase.execute(user.getId(), days));
     }
 }

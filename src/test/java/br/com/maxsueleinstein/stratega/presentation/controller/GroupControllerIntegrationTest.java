@@ -35,27 +35,40 @@ class GroupControllerIntegrationTest {
         @Autowired
         private WebApplicationContext context;
 
+        @Autowired
+        private br.com.maxsueleinstein.stratega.domain.repository.UserRepository userRepository;
+
         @MockitoBean
         private JwtTokenProviderPort jwtTokenProviderPort;
 
-        private ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        private ObjectMapper objectMapper = new ObjectMapper()
+                        .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+
+        private UUID ownerId;
 
         @BeforeEach
         void setUp() {
                 this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
-                                .apply(org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity())
+                                .apply(org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
+                                                .springSecurity())
                                 .build();
+                
+                ownerId = UUID.randomUUID();
+                br.com.maxsueleinstein.stratega.domain.model.User user = new br.com.maxsueleinstein.stratega.domain.model.User(
+                    ownerId, "Owner", "owner@example.com", "password"
+                );
+                userRepository.save(user);
+
                 // Mock token validation to allow access
                 when(jwtTokenProviderPort.validateToken(anyString())).thenReturn(true);
+                when(jwtTokenProviderPort.getUserIdFromToken(anyString())).thenReturn(ownerId.toString());
         }
 
         @Test
         @DisplayName("Deve criar um grupo, adicionar despesa e consultar balanços")
         void shouldCreateGroupAddExpenseAndGetBalances() throws Exception {
-                UUID ownerId = UUID.randomUUID();
-                when(jwtTokenProviderPort.getUserIdFromToken(anyString())).thenReturn(ownerId.toString());
-                
-                CreateGroupRequest createRequest = new CreateGroupRequest("Viagem", ownerId, List.of("Alice", "Bob"));
+                CreateGroupRequest createRequest = new CreateGroupRequest("Viagem", ownerId, "Owner",
+                                List.of("Alice", "Bob"));
 
                 // 1. Criar Grupo
                 String createResponseJson = mockMvc.perform(post("/api/groups")
@@ -70,14 +83,14 @@ class GroupControllerIntegrationTest {
                                 createResponseJson,
                                 br.com.maxsueleinstein.stratega.application.dto.GroupResponse.class);
                 UUID groupId = group.id();
-                UUID aliceId = group.members().get(0).name().equals("Alice") ? group.members().get(0).id()
-                                : group.members().get(1).id();
-                UUID bobId = group.members().get(0).name().equals("Bob") ? group.members().get(0).id()
-                                : group.members().get(1).id();
+                UUID aliceId = group.members().stream().filter(m -> m.name().equals("Alice")).findFirst().get().id();
+                UUID bobId = group.members().stream().filter(m -> m.name().equals("Bob")).findFirst().get().id();
 
                 // 2. Adicionar Despesa (Alice pagou 100, dividido igualmente)
                 AddGroupExpenseRequest expenseRequest = new AddGroupExpenseRequest(
-                                groupId, ownerId, "Jantar", new BigDecimal("100.00"), aliceId, java.time.LocalDateTime.now(), "UNIFORM", Map.of());
+                                groupId, ownerId, "Jantar", new BigDecimal("100.00"), aliceId,
+                                null, // walletId
+                                java.time.LocalDateTime.now(), "UNIFORM", Map.of());
 
                 mockMvc.perform(post("/api/groups/" + groupId + "/expenses")
                                 .header("Authorization", "Bearer dummy-token")
@@ -86,23 +99,22 @@ class GroupControllerIntegrationTest {
                                 .andExpect(status().isOk());
 
                 // 3. Consultar Balanços
+                // 100 / 3 = 33.33 cada. Alice pagou 100 -> +66.67. Bob e Owner -> -33.33
                 mockMvc.perform(get("/api/groups/" + groupId + "/balances")
                                 .header("Authorization", "Bearer dummy-token"))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.memberBalances." + aliceId).value(50.0))
-                                .andExpect(jsonPath("$.memberBalances." + bobId).value(-50.0))
-                                .andExpect(jsonPath("$.suggestedTransfers[0].amount").value(50.0))
-                                .andExpect(jsonPath("$.suggestedTransfers[0].from.name").value("Bob"))
+                                .andExpect(jsonPath("$.memberBalances." + aliceId).value(66.67))
+                                .andExpect(jsonPath("$.memberBalances." + bobId).value(-33.33))
+                                .andExpect(jsonPath("$.suggestedTransfers[0].amount").value(33.34))
+                                .andExpect(jsonPath("$.suggestedTransfers[0].from.name").value("Owner"))
                                 .andExpect(jsonPath("$.suggestedTransfers[0].to.name").value("Alice"));
         }
 
         @Test
         @DisplayName("Deve criar um grupo, adicionar despesa com divisão exata e consultar balanços")
         void shouldCreateGroupWithExactSplit() throws Exception {
-                UUID ownerId = UUID.randomUUID();
-                when(jwtTokenProviderPort.getUserIdFromToken(anyString())).thenReturn(ownerId.toString());
-
-                CreateGroupRequest createRequest = new CreateGroupRequest("Aluguel", ownerId, List.of("Alice", "Bob"));
+                CreateGroupRequest createRequest = new CreateGroupRequest("Aluguel", ownerId, "Owner",
+                                List.of("Alice", "Bob"));
 
                 String createResponseJson = mockMvc.perform(post("/api/groups")
                                 .header("Authorization", "Bearer dummy-token")
@@ -115,14 +127,14 @@ class GroupControllerIntegrationTest {
                                 createResponseJson,
                                 br.com.maxsueleinstein.stratega.application.dto.GroupResponse.class);
                 UUID groupId = group.id();
-                UUID aliceId = group.members().get(0).name().equals("Alice") ? group.members().get(0).id()
-                                : group.members().get(1).id();
-                UUID bobId = group.members().get(0).name().equals("Bob") ? group.members().get(0).id()
-                                : group.members().get(1).id();
+                UUID aliceId = group.members().stream().filter(m -> m.name().equals("Alice")).findFirst().get().id();
+                UUID bobId = group.members().stream().filter(m -> m.name().equals("Bob")).findFirst().get().id();
 
                 // 2. Adicionar Despesa Exata (Alice pagou 150, Alice deve 100, Bob deve 50)
                 AddGroupExpenseRequest expenseRequest = new AddGroupExpenseRequest(
-                                groupId, ownerId, "Aluguel Maio", new BigDecimal("150.00"), aliceId, java.time.LocalDateTime.now(), "EXACT",
+                                groupId, ownerId, "Aluguel Maio", new BigDecimal("150.00"), aliceId,
+                                null, // walletId
+                                java.time.LocalDateTime.now(), "EXACT",
                                 Map.of(aliceId, "100.00", bobId, "50.00"));
 
                 mockMvc.perform(post("/api/groups/" + groupId + "/expenses")
@@ -132,8 +144,10 @@ class GroupControllerIntegrationTest {
                                 .andExpect(status().isOk());
 
                 // 3. Consultar Balanços
-                // Alice pagou 150, deve 100 -> Saldo +50
-                // Bob pagou 0, deve 50 -> Saldo -50
+                // Total 150. Alice deve 100, Bob 50, Owner 0 (conforme Map).
+                // Alice pagou 150, deve 100 -> +50
+                // Bob pagou 0, deve 50 -> -50
+                // Owner pagou 0, deve 0 -> 0
                 mockMvc.perform(get("/api/groups/" + groupId + "/balances")
                                 .header("Authorization", "Bearer dummy-token"))
                                 .andExpect(status().isOk())

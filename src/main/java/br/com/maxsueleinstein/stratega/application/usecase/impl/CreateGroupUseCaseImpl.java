@@ -18,6 +18,9 @@ public class CreateGroupUseCaseImpl implements CreateGroupUseCase {
     public ExpenseGroup execute(CreateGroupRequest request) {
         ExpenseGroup group = new ExpenseGroup(null, request.name(), request.ownerId());
         
+        // Add owner as the first member
+        group.addMember(new ExpenseGroupMember(null, request.ownerName(), request.ownerId()));
+        
         if (request.memberNames() != null) {
             for (String name : request.memberNames()) {
                 group.addMember(new ExpenseGroupMember(null, name, null));

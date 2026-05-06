@@ -37,6 +37,7 @@ public class CreateTransactionUseCaseImpl implements CreateTransactionUseCase {
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public java.util.List<TransactionResponse> execute(CreateTransactionRequest request) {
         Wallet wallet = walletRepository.findById(request.walletId())
                 .orElseThrow(() -> new IllegalArgumentException("Carteira não encontrada"));
@@ -76,15 +77,21 @@ public class CreateTransactionUseCaseImpl implements CreateTransactionUseCase {
             if (transaction.isIncome()) {
                 wallet.addFunds(transaction.getAmount());
             } else if (transaction.isExpense()) {
+                // Detectar overdraft: se carteira restrita e operação causaria saldo negativo,
+                // converter automaticamente e disparar evento de notificação
+                if (!wallet.isAllowNegativeBalance() && wallet.wouldGoNegative(transaction.getAmount())) {
+                    wallet.enableOverdraft();
+                    eventPublisher.publishEvent(new br.com.maxsueleinstein.stratega.domain.event.OverdraftActivatedEvent(
+                            wallet.getUserId(),
+                            wallet.getName(),
+                            wallet.getBalance(),
+                            transaction.getAmount()
+                    ));
+                }
                 wallet.removeFunds(transaction.getAmount());
             }
 
             Transaction savedTransaction = transactionRepository.save(transaction);
-
-            // Check budget for expenses with category
-            if (savedTransaction.isExpense() && savedTransaction.getCategoryId() != null) {
-                checkBudgetExceeded(savedTransaction, wallet.getUserId());
-            }
 
             responses.add(new TransactionResponse(
                     savedTransaction.getId(),
@@ -95,11 +102,28 @@ public class CreateTransactionUseCaseImpl implements CreateTransactionUseCase {
                     savedTransaction.getType(),
                     savedTransaction.getWalletId(),
                     savedTransaction.getCategoryId(),
-                    savedTransaction.getLinkedTransactionId()
+                    savedTransaction.getLinkedTransactionId(),
+                    savedTransaction.getGroupId()
             ));
         }
 
         walletRepository.save(wallet);
+
+        // Check budget for expenses with category outside the loop to avoid N+1
+        if (request.type() == br.com.maxsueleinstein.stratega.domain.model.TransactionType.EXPENSE && request.categoryId() != null) {
+            java.util.Set<String> checkedPeriods = new java.util.HashSet<>();
+            for (TransactionResponse resp : responses) {
+                int m = resp.date().getMonthValue();
+                int y = resp.date().getYear();
+                String key = m + "-" + y;
+                if (checkedPeriods.add(key)) {
+                    // We only need a temporary transaction to pass the date/category to checkBudgetExceeded
+                    Transaction temp = new Transaction(null, "", java.math.BigDecimal.ZERO, resp.date(), request.type(), request.walletId(), request.categoryId(), null);
+                    checkBudgetExceeded(temp, wallet.getUserId());
+                }
+            }
+        }
+
         return responses;
     }
 

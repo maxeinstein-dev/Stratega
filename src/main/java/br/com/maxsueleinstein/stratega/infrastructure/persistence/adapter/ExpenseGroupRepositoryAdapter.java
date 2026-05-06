@@ -37,4 +37,9 @@ public class ExpenseGroupRepositoryAdapter implements ExpenseGroupRepository {
                 .map(ExpenseGroupMapper::toDomain)
                 .collect(java.util.stream.Collectors.toList());
     }
+
+    @Override
+    public void deleteById(UUID id) {
+        repository.deleteById(id);
+    }
 }

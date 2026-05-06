@@ -26,4 +26,6 @@ public class WalletEntity {
     private String currency;
     @Builder.Default
     private boolean active = true;
+    @Builder.Default
+    private boolean allowNegativeBalance = true;
 }

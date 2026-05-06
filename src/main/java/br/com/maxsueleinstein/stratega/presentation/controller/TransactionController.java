@@ -3,30 +3,42 @@ package br.com.maxsueleinstein.stratega.presentation.controller;
 import br.com.maxsueleinstein.stratega.application.dto.CreateTransactionRequest;
 import br.com.maxsueleinstein.stratega.application.dto.TransactionResponse;
 import br.com.maxsueleinstein.stratega.application.dto.TransferFundsRequest;
-import br.com.maxsueleinstein.stratega.application.usecase.CreateTransactionUseCase;
-import br.com.maxsueleinstein.stratega.application.usecase.TransferFundsUseCase;
+import br.com.maxsueleinstein.stratega.application.dto.UpdateTransactionRequest;
+import br.com.maxsueleinstein.stratega.application.usecase.*;
+import br.com.maxsueleinstein.stratega.domain.model.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/transactions")
+@Tag(name = "Transactions", description = "Endpoints para gerenciamento de movimentações financeiras")
 public class TransactionController {
 
     private final CreateTransactionUseCase createTransactionUseCase;
     private final TransferFundsUseCase transferFundsUseCase;
-    private final br.com.maxsueleinstein.stratega.application.usecase.FindTransactionsByUserIdUseCase findTransactionsByUserIdUseCase;
-
-    private final br.com.maxsueleinstein.stratega.application.usecase.UpdateTransactionUseCase updateTransactionUseCase;
-    private final br.com.maxsueleinstein.stratega.application.usecase.ImportTransactionsUseCase importTransactionsUseCase;
-    private final br.com.maxsueleinstein.stratega.application.usecase.DeleteTransactionUseCase deleteTransactionUseCase;
+    private final FindTransactionsByUserIdUseCase findTransactionsByUserIdUseCase;
+    private final UpdateTransactionUseCase updateTransactionUseCase;
+    private final ImportTransactionsUseCase importTransactionsUseCase;
+    private final DeleteTransactionUseCase deleteTransactionUseCase;
 
     public TransactionController(CreateTransactionUseCase createTransactionUseCase,
             TransferFundsUseCase transferFundsUseCase,
-            br.com.maxsueleinstein.stratega.application.usecase.FindTransactionsByUserIdUseCase findTransactionsByUserIdUseCase,
-            br.com.maxsueleinstein.stratega.application.usecase.UpdateTransactionUseCase updateTransactionUseCase,
-            br.com.maxsueleinstein.stratega.application.usecase.ImportTransactionsUseCase importTransactionsUseCase,
-            br.com.maxsueleinstein.stratega.application.usecase.DeleteTransactionUseCase deleteTransactionUseCase) {
+            FindTransactionsByUserIdUseCase findTransactionsByUserIdUseCase,
+            UpdateTransactionUseCase updateTransactionUseCase,
+            ImportTransactionsUseCase importTransactionsUseCase,
+            DeleteTransactionUseCase deleteTransactionUseCase) {
         this.createTransactionUseCase = createTransactionUseCase;
         this.transferFundsUseCase = transferFundsUseCase;
         this.findTransactionsByUserIdUseCase = findTransactionsByUserIdUseCase;
@@ -36,28 +48,33 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<java.util.List<TransactionResponse>> createTransaction(@RequestBody CreateTransactionRequest request) {
-        java.util.List<TransactionResponse> response = createTransactionUseCase.execute(request);
+    @Operation(summary = "Criar nova transação (Receita ou Despesa)")
+    public ResponseEntity<List<TransactionResponse>> createTransaction(
+            @AuthenticationPrincipal User user,
+            @RequestBody CreateTransactionRequest request) {
+        List<TransactionResponse> response = createTransactionUseCase.execute(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/transfer")
-    public ResponseEntity<Void> transferFunds(@RequestBody TransferFundsRequest request) {
+    @Operation(summary = "Realizar transferência entre carteiras")
+    public ResponseEntity<Void> transferFunds(
+            @AuthenticationPrincipal User user,
+            @RequestBody TransferFundsRequest request) {
         transferFundsUseCase.execute(request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping(value = "/import", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<java.util.Map<String, Object>> importTransactions(
-            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
-            @RequestParam("walletId") java.util.UUID walletId) {
-        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication();
-        java.util.UUID userId = java.util.UUID.fromString((String) authentication.getPrincipal());
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Importar extrato bancário (OFX ou CSV)")
+    public ResponseEntity<Map<String, Object>> importTransactions(
+            @AuthenticationPrincipal User user,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("walletId") UUID walletId) {
 
-        int importedCount = importTransactionsUseCase.execute(userId, walletId, file);
+        int importedCount = importTransactionsUseCase.execute(user.getId(), walletId, file);
         
-        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         response.put("message", "Importação realizada com sucesso.");
         response.put("importedTransactions", importedCount);
 
@@ -65,38 +82,34 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<java.util.List<TransactionResponse>> getTransactions(
+    @Operation(summary = "Listar transações do usuário com filtros opcionais")
+    public ResponseEntity<List<TransactionResponse>> getTransactions(
+            @AuthenticationPrincipal User user,
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) Integer year) {
-        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication();
-        java.util.UUID userId = java.util.UUID.fromString((String) authentication.getPrincipal());
 
-        java.util.List<TransactionResponse> transactions = findTransactionsByUserIdUseCase.execute(userId, month, year);
+        List<TransactionResponse> transactions = findTransactionsByUserIdUseCase.execute(user.getId(), month, year);
         return ResponseEntity.ok(transactions);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Editar uma transação existente")
     public ResponseEntity<TransactionResponse> updateTransaction(
-            @PathVariable java.util.UUID id,
-            @RequestBody br.com.maxsueleinstein.stratega.application.dto.UpdateTransactionRequest request) {
-        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication();
-        java.util.UUID requesterId = java.util.UUID.fromString((String) authentication.getPrincipal());
-
-        TransactionResponse response = updateTransactionUseCase.execute(id, requesterId, request);
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User user,
+            @RequestBody UpdateTransactionRequest request) {
+        TransactionResponse response = updateTransactionUseCase.execute(id, user.getId(), request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/export")
+    @Operation(summary = "Exportar transações do usuário para CSV")
     public ResponseEntity<String> exportTransactions(
+            @AuthenticationPrincipal User user,
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) Integer year) {
-        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication();
-        java.util.UUID userId = java.util.UUID.fromString((String) authentication.getPrincipal());
 
-        java.util.List<TransactionResponse> transactions = findTransactionsByUserIdUseCase.execute(userId, month, year);
+        List<TransactionResponse> transactions = findTransactionsByUserIdUseCase.execute(user.getId(), month, year);
 
         StringBuilder csv = new StringBuilder("ID,Data,Descrição,Valor,Tipo,Categoria\n");
         for (TransactionResponse tx : transactions) {
@@ -109,20 +122,19 @@ public class TransactionController {
                .append("\n");
         }
 
-        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
-        headers.add(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=transactions.csv");
-        headers.add(org.springframework.http.HttpHeaders.CONTENT_TYPE, "text/csv; charset=UTF-8");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=transactions.csv");
+        headers.add(HttpHeaders.CONTENT_TYPE, "text/csv; charset=UTF-8");
 
         return new ResponseEntity<>(csv.toString(), headers, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable java.util.UUID id) {
-        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication();
-        java.util.UUID userId = java.util.UUID.fromString((String) authentication.getPrincipal());
-
-        deleteTransactionUseCase.execute(id, userId);
+    @Operation(summary = "Excluir uma transação e reverter impacto no saldo")
+    public ResponseEntity<Void> deleteTransaction(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User user) {
+        deleteTransactionUseCase.execute(id, user.getId());
         return ResponseEntity.noContent().build();
     }
 }

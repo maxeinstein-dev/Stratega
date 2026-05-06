@@ -1,6 +1,7 @@
 package br.com.maxsueleinstein.stratega.application.event;
 
 import br.com.maxsueleinstein.stratega.domain.event.BudgetExceededEvent;
+import br.com.maxsueleinstein.stratega.domain.event.OverdraftActivatedEvent;
 import br.com.maxsueleinstein.stratega.domain.model.Notification;
 import br.com.maxsueleinstein.stratega.domain.repository.NotificationRepository;
 import org.springframework.context.event.EventListener;
@@ -31,6 +32,26 @@ public class NotificationEventListener {
                 null
         );
         
+        notificationRepository.save(notification);
+    }
+
+    @EventListener
+    public void handleOverdraftActivated(OverdraftActivatedEvent event) {
+        String title = "Saldo Negativo Ativado";
+        String message = String.format(
+                "Sua carteira '%s' entrou em saldo negativo. O modo de saldo negativo foi ativado automaticamente para permitir a operação.",
+                event.getWalletName());
+
+        Notification notification = new Notification(
+                null,
+                event.getUserId(),
+                title,
+                message,
+                "OVERDRAFT_ACTIVATED",
+                false,
+                null
+        );
+
         notificationRepository.save(notification);
     }
 }

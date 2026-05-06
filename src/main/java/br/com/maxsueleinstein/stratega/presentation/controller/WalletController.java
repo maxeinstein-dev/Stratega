@@ -1,62 +1,85 @@
 package br.com.maxsueleinstein.stratega.presentation.controller;
 
 import br.com.maxsueleinstein.stratega.application.dto.CreateWalletRequest;
+import br.com.maxsueleinstein.stratega.application.dto.UpdateWalletRequest;
 import br.com.maxsueleinstein.stratega.application.dto.WalletResponse;
 import br.com.maxsueleinstein.stratega.application.usecase.CreateWalletUseCase;
+import br.com.maxsueleinstein.stratega.application.usecase.DeleteWalletUseCase;
+import br.com.maxsueleinstein.stratega.application.usecase.FindWalletsByUserIdUseCase;
+import br.com.maxsueleinstein.stratega.application.usecase.UpdateWalletUseCase;
+import br.com.maxsueleinstein.stratega.domain.model.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/wallets")
+@Tag(name = "Wallets", description = "Endpoints para gerenciamento de carteiras")
 public class WalletController {
 
     private final CreateWalletUseCase createWalletUseCase;
-    private final br.com.maxsueleinstein.stratega.application.usecase.FindWalletsByUserIdUseCase findWalletsByUserIdUseCase;
-    private final br.com.maxsueleinstein.stratega.application.usecase.UpdateWalletUseCase updateWalletUseCase;
-    private final br.com.maxsueleinstein.stratega.application.usecase.DeleteWalletUseCase deleteWalletUseCase;
+    private final FindWalletsByUserIdUseCase findWalletsByUserIdUseCase;
+    private final UpdateWalletUseCase updateWalletUseCase;
+    private final DeleteWalletUseCase deleteWalletUseCase;
 
     public WalletController(CreateWalletUseCase createWalletUseCase,
-            br.com.maxsueleinstein.stratega.application.usecase.FindWalletsByUserIdUseCase findWalletsByUserIdUseCase,
-            br.com.maxsueleinstein.stratega.application.usecase.UpdateWalletUseCase updateWalletUseCase,
-            br.com.maxsueleinstein.stratega.application.usecase.DeleteWalletUseCase deleteWalletUseCase) {
+            FindWalletsByUserIdUseCase findWalletsByUserIdUseCase,
+            UpdateWalletUseCase updateWalletUseCase,
+            DeleteWalletUseCase deleteWalletUseCase) {
         this.createWalletUseCase = createWalletUseCase;
         this.findWalletsByUserIdUseCase = findWalletsByUserIdUseCase;
         this.updateWalletUseCase = updateWalletUseCase;
         this.deleteWalletUseCase = deleteWalletUseCase;
     }
- 
+
     @PostMapping
-    public ResponseEntity<WalletResponse> createWallet(@RequestBody CreateWalletRequest request) {
-        WalletResponse response = createWalletUseCase.execute(request);
+    @Operation(summary = "Criar nova carteira para o usuário autenticado")
+    public ResponseEntity<WalletResponse> createWallet(
+            @AuthenticationPrincipal User user,
+            @RequestBody CreateWalletRequest request) {
+        
+        // Garante que a carteira seja criada para o usuário logado
+        CreateWalletRequest authenticatedRequest = new CreateWalletRequest(
+                request.name(), 
+                request.initialBalance(), 
+                user.getId(), 
+                request.currency(),
+                request.allowNegativeBalance()
+        );
+        
+        WalletResponse response = createWalletUseCase.execute(authenticatedRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
- 
+
     @GetMapping
-    public ResponseEntity<java.util.List<WalletResponse>> getWallets() {
-        java.util.UUID userId = getAuthenticatedUserId();
-        java.util.List<WalletResponse> wallets = findWalletsByUserIdUseCase.execute(userId);
+    @Operation(summary = "Listar todas as carteiras do usuário autenticado")
+    public ResponseEntity<List<WalletResponse>> getWallets(@AuthenticationPrincipal User user) {
+        List<WalletResponse> wallets = findWalletsByUserIdUseCase.execute(user.getId());
         return ResponseEntity.ok(wallets);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<WalletResponse> updateWallet(@PathVariable java.util.UUID id,
-            @RequestBody br.com.maxsueleinstein.stratega.application.dto.UpdateWalletRequest request) {
-        java.util.UUID userId = getAuthenticatedUserId();
-        WalletResponse response = updateWalletUseCase.execute(id, userId, request);
+    @Operation(summary = "Atualizar dados de uma carteira")
+    public ResponseEntity<WalletResponse> updateWallet(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User user,
+            @RequestBody UpdateWalletRequest request) {
+        WalletResponse response = updateWalletUseCase.execute(id, user.getId(), request);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteWallet(@PathVariable java.util.UUID id) {
-        java.util.UUID userId = getAuthenticatedUserId();
-        deleteWalletUseCase.execute(id, userId);
+    @Operation(summary = "Excluir uma carteira (Soft Delete se houver transações)")
+    public ResponseEntity<Void> deleteWallet(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User user) {
+        deleteWalletUseCase.execute(id, user.getId());
         return ResponseEntity.noContent().build();
-    }
-
-    private java.util.UUID getAuthenticatedUserId() {
-        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication();
-        return java.util.UUID.fromString((String) authentication.getPrincipal());
     }
 }

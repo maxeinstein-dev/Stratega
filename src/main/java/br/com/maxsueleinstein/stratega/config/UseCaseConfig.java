@@ -57,8 +57,11 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public br.com.maxsueleinstein.stratega.application.usecase.AddGroupExpenseUseCase addGroupExpenseUseCase(br.com.maxsueleinstein.stratega.domain.repository.ExpenseGroupRepository repository) {
-        return new br.com.maxsueleinstein.stratega.application.usecase.impl.AddGroupExpenseUseCaseImpl(repository);
+    public br.com.maxsueleinstein.stratega.application.usecase.AddGroupExpenseUseCase addGroupExpenseUseCase(
+            br.com.maxsueleinstein.stratega.domain.repository.ExpenseGroupRepository repository,
+            WalletRepository walletRepository,
+            TransactionRepository transactionRepository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.AddGroupExpenseUseCaseImpl(repository, walletRepository, transactionRepository);
     }
 
     @Bean
@@ -72,8 +75,10 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public br.com.maxsueleinstein.stratega.application.usecase.FindTransactionsByUserIdUseCase findTransactionsByUserIdUseCase(TransactionRepository transactionRepository) {
-        return new br.com.maxsueleinstein.stratega.application.usecase.impl.FindTransactionsByUserIdUseCaseImpl(transactionRepository);
+    public br.com.maxsueleinstein.stratega.application.usecase.FindTransactionsByUserIdUseCase findTransactionsByUserIdUseCase(
+            TransactionRepository transactionRepository,
+            br.com.maxsueleinstein.stratega.domain.repository.ExpenseGroupRepository repository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.FindTransactionsByUserIdUseCaseImpl(transactionRepository, repository);
     }
 
     @Bean
@@ -174,5 +179,20 @@ public class UseCaseConfig {
     @Bean
     public br.com.maxsueleinstein.stratega.application.usecase.GetCategoryComparisonUseCase getCategoryComparisonUseCase(TransactionRepository transactionRepository, br.com.maxsueleinstein.stratega.domain.repository.CategoryRepository categoryRepository, WalletRepository walletRepository, br.com.maxsueleinstein.stratega.domain.service.ExchangeRateService exchangeRateService) {
         return new br.com.maxsueleinstein.stratega.application.usecase.impl.GetCategoryComparisonUseCaseImpl(transactionRepository, categoryRepository, walletRepository, exchangeRateService);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.DeleteGroupUseCase deleteGroupUseCase(br.com.maxsueleinstein.stratega.domain.repository.ExpenseGroupRepository repository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.DeleteGroupUseCaseImpl(repository);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.FindGroupByIdUseCase findGroupByIdUseCase(br.com.maxsueleinstein.stratega.domain.repository.ExpenseGroupRepository repository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.FindGroupByIdUseCaseImpl(repository);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.FindGroupMovementsUseCase findGroupMovementsUseCase(br.com.maxsueleinstein.stratega.domain.repository.ExpenseGroupRepository repository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.FindGroupMovementsUseCaseImpl(repository);
     }
 }

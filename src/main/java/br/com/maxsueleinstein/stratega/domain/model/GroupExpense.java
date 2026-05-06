@@ -14,17 +14,23 @@ public class GroupExpense {
     private final ExpenseGroupMember paidBy;
     private final java.time.LocalDateTime date;
     private final List<Split> splits;
+    private final String type; // "EXPENSE" ou "SETTLEMENT"
 
-    public GroupExpense(UUID id, String description, BigDecimal totalAmount, ExpenseGroupMember paidBy, java.time.LocalDateTime date, List<Split> splits, SplitStrategy strategy) {
+    public GroupExpense(UUID id, String description, BigDecimal totalAmount, ExpenseGroupMember paidBy, java.time.LocalDateTime date, List<Split> splits, SplitStrategy strategy, String type) {
         this.id = id != null ? id : UUID.randomUUID();
         this.description = description;
         this.totalAmount = totalAmount;
         this.paidBy = paidBy;
         this.date = date != null ? date : java.time.LocalDateTime.now();
         this.splits = splits;
+        this.type = type != null ? type : "EXPENSE";
         if (strategy != null) {
             strategy.calculateSplit(totalAmount, splits);
         }
+    }
+
+    public String getType() {
+        return type;
     }
 
     public UUID getId() {

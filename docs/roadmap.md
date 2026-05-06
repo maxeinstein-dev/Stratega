@@ -33,7 +33,7 @@ Melhorias para garantir que a API seja consumível por um front-end moderno.
 
 Módulo complexo de divisão de contas para viagens e rachadinhas.
 
-- **Criação de Grupos:** Usuário logado vira "owner", adição livre de "members".
+- **Criação de Grupos:** Usuário logado vira "owner" e é adicionado automaticamente como membro, adição livre de "members".
 - **Tracking de Despesas:** Possibilidade de lançar gastos associados a grupos.
 - **Estratégias de Divisão (`SplitType`):**
   - `UNIFORM`: Divisão igualitária automática.
@@ -81,11 +81,17 @@ Foco em garantir a precisão matemática absoluta e facilitar acertos de contas.
 - **Importação Multi-formato:** Suporte a arquivos `.csv` e `.ofx` para facilitar a migração de outros apps.
 - **Soft Delete de Carteiras:** Bloqueio de exclusão física para carteiras com histórico, permitindo apenas o arquivamento para preservar relatórios passados.
 - **Segurança em Categorias:** Proteção contra edição de categorias globais e deleção de categorias em uso.
+- **Estabilização de Grupos:** Implementação de endpoints de detalhes (`GET`) e exclusão (`DELETE`) com validação de posse.
+- **Robustez na Importação:** Correção de headers para suporte total a envios via `FormData` (OFX/CSV).
 
 ### Módulo 7: Globalização e Engajamento ✅
 - **Globalização (Multi-Moedas):** Suporte a carteiras em USD/EUR com conversão automática via ExchangeRate-API.
 - **Notificações Inteligentes:** Sistema de alertas in-app para orçamentos atingidos.
 - **Relatórios Avançados:** Gráficos de tendência e comparativos mensais.
+
+### Módulo 8: Analítica Visual e Objetivos de Poupança ✅
+- **Dashboards Históricos:** Novo endpoint `/api/dashboard/historical` com suporte a agrupamento flexível (30, 90, 180, 365 dias) retornando evolução de Receitas, Despesas e Poupança Mensal.
+- **Módulo de Objetivos de Poupança (`SavingsGoal`):** Domínio completo isolado de orçamentos (Budgets), focado em metas de economia a longo prazo com tracking de valor depositado e percentual de progresso.
 
 ---
 

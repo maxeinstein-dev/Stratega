@@ -26,6 +26,10 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
  
     @Override
     public UserResponse execute(RegisterUserRequest request) {
+        if (request.password() == null || request.password().length() < 8) {
+            throw new IllegalArgumentException("A senha deve ter pelo menos 8 caracteres");
+        }
+
         userRepository.findByEmail(request.email()).ifPresent(user -> {
             throw new IllegalArgumentException("O email informado já está em uso");
         });

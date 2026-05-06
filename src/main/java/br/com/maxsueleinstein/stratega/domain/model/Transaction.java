@@ -19,14 +19,20 @@ public class Transaction {
     private UUID walletId;
     private UUID categoryId;
     private final UUID linkedTransactionId; // Used for transfers
+    private final UUID groupId; // Opcional: Para transações originadas em grupos
 
     public Transaction(UUID id, String description, BigDecimal amount, LocalDateTime date,
             TransactionType type, UUID walletId, UUID categoryId, UUID linkedTransactionId) {
-        this(id, description, amount, null, date, type, walletId, categoryId, linkedTransactionId);
+        this(id, description, amount, null, date, type, walletId, categoryId, linkedTransactionId, null);
     }
 
     public Transaction(UUID id, String description, BigDecimal amount, BigDecimal netAmount, LocalDateTime date,
             TransactionType type, UUID walletId, UUID categoryId, UUID linkedTransactionId) {
+        this(id, description, amount, netAmount, date, type, walletId, categoryId, linkedTransactionId, null);
+    }
+
+    public Transaction(UUID id, String description, BigDecimal amount, BigDecimal netAmount, LocalDateTime date,
+            TransactionType type, UUID walletId, UUID categoryId, UUID linkedTransactionId, UUID groupId) {
         validateDescription(description);
         validateAmount(amount);
         validateDate(date);
@@ -47,6 +53,7 @@ public class Transaction {
         this.walletId = walletId;
         this.categoryId = categoryId;
         this.linkedTransactionId = linkedTransactionId;
+        this.groupId = groupId;
     }
 
     public void updateDetails(String description, BigDecimal amount, LocalDateTime date, UUID categoryId, UUID walletId) {
@@ -134,6 +141,10 @@ public class Transaction {
 
     public UUID getLinkedTransactionId() {
         return linkedTransactionId;
+    }
+
+    public UUID getGroupId() {
+        return groupId;
     }
 
     @Override

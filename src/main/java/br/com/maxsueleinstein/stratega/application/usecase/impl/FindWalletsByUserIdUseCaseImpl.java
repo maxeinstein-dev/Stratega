@@ -26,7 +26,8 @@ public class FindWalletsByUserIdUseCaseImpl implements FindWalletsByUserIdUseCas
                         wallet.getBalance(),
                         wallet.getUserId(),
                         wallet.getCurrency(),
-                        wallet.isActive()
+                        wallet.isActive(),
+                        wallet.isAllowNegativeBalance()
                 ))
                 .collect(Collectors.toList());
     }

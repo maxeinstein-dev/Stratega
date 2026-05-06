@@ -4,5 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 
 public record UpdateWalletRequest(
     @NotBlank(message = "O nome da carteira é obrigatório")
-    String name
+    String name,
+    Boolean allowNegativeBalance
 ) {}

@@ -32,7 +32,7 @@ class CreateWalletUseCaseTest {
     @Test
     void shouldCreateWalletSuccessfully() {
         UUID userId = UUID.randomUUID();
-        CreateWalletRequest request = new CreateWalletRequest("Carteira Casa", BigDecimal.ZERO, userId, Currency.BRL);
+        CreateWalletRequest request = new CreateWalletRequest("Carteira Casa", BigDecimal.ZERO, userId, Currency.BRL, null);
         
         Wallet savedWallet = new Wallet(UUID.randomUUID(), request.name(), request.initialBalance(), request.userId());
         when(walletRepository.save(any(Wallet.class))).thenReturn(savedWallet);

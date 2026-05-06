@@ -28,6 +28,9 @@ public class UpdateWalletUseCaseImpl implements UpdateWalletUseCase {
         }
 
         wallet.updateName(request.name());
+        if (request.allowNegativeBalance() != null) {
+            wallet.setAllowNegativeBalance(request.allowNegativeBalance());
+        }
         Wallet savedWallet = walletRepository.save(wallet);
 
         return new WalletResponse(
@@ -36,7 +39,8 @@ public class UpdateWalletUseCaseImpl implements UpdateWalletUseCase {
                 savedWallet.getBalance(),
                 savedWallet.getUserId(),
                 savedWallet.getCurrency(),
-                savedWallet.isActive()
+                savedWallet.isActive(),
+                savedWallet.isAllowNegativeBalance()
         );
     }
 }

@@ -9,5 +9,6 @@ public record CreateWalletRequest(
         String name,
         BigDecimal initialBalance,
         UUID userId,
-        Currency currency
+        Currency currency,
+        Boolean allowNegativeBalance
 ) {}

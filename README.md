@@ -1,119 +1,76 @@
-# Stratega - API de Gestão Financeira Inteligente
+<div align="center">
+  
+# 🚀 Stratega - API Financeira Inteligente
+  
+[![Java](https://img.shields.io/badge/Java-25-orange?style=for-the-badge&logo=java)](#)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.x-brightgreen?style=for-the-badge&logo=spring)](#)
+[![JWT](https://img.shields.io/badge/Secured_with-JWT-blue?style=for-the-badge)](#)
+[![Hexagonal](https://img.shields.io/badge/Architecture-Hexagonal-blueviolet?style=for-the-badge)](#)
+[![License](https://img.shields.io/badge/License-MIT-gray?style=for-the-badge)](#)
 
-> API robusta para planejamento e controle financeiro pessoal e em grupo.
+*Assuma o controle total do seu patrimônio com uma API moderna, testável e pronta para produção.*
 
-Stratega é uma API REST moderna construída com **Java 25**, **Spring Boot 4** e fundamentada em **Arquitetura Hexagonal**. O projeto foca em alta testabilidade, isolamento de regras de negócio e escalabilidade, servindo tanto como uma ferramenta funcional quanto como um portfólio de engenharia de software de alta qualidade.
+---
+</div>
+
+## 🌟 O que é o Stratega?
+
+O **Stratega** é muito mais do que um simples "anotador de gastos". Ele é o verdadeiro motor de um ecossistema de planejamento financeiro, suportando rotinas avançadas que ajudam você e seus amigos a manterem as finanças no azul.
+
+Ele foi construído focado no mais alto nível de engenharia de software (Clean Architecture / Hexagonal), permitindo máxima testabilidade e performance matemática.
+
+## ✨ Destaques & Funcionalidades
+
+💳 **Carteiras Flexíveis**  
+Suporte para múltiplas carteiras simultâneas, moedas globais (USD, EUR, BTC) e suporte nativo a saldo negativo para você gerenciar seus cartões de crédito.
+
+📊 **Dashboards Analíticos**  
+Rotas especializadas para retornar agrupamentos de faturamento, despesas por categoria e evolução histórica (filtros de 30 a 365 dias) desenhados para otimizar renderizações em gráficos.
+
+🎯 **Metas e Objetivos (Savings Goals)**  
+Módulo dedicado para planejar o futuro (ex: *Viagem, Carro*), recebendo injeções de fundos e calculando porcentagens de progresso automaticamente.
+
+🤝 **Social Finance (Despesas em Grupo)**  
+Divida o happy hour ou a viagem sem confusão. O Stratega suporta divisões Exatas, Uniformes, Porcentagem ou Cotas, e gera transferências sugeridas que liquidam dívidas de forma otimizada injetando saldo direto na sua carteira.
+
+🔁 **Recorrência e Automação**  
+Criação automática de compras parceladas ou despesas fixas recorrentes projetando seus impactos futuros.
 
 ---
 
-## 🌟 Visão Geral
+## 📚 Documentação Aprofundada
 
-O Stratega vai além do simples registro de gastos, oferecendo:
+Gosta de entender o funcionamento do motor por baixo do capô? Nós preparamos documentos detalhados sobre as escolhas arquiteturais e a evolução da nossa API. 
 
-*   **Gestão de Usuários e Segurança:** Autenticação via JWT e criptografia de senhas.
-*   **Carteiras (Wallets):** Múltiplas carteiras com suporte a saldo positivo e negativo (cartões de crédito).
-*   **Transações Inteligentes:** Registro de receitas, despesas e transferências entre carteiras com atualização automática de saldo.
-*   **Categorias Customizadas:** Organização flexível por usuário ou categorias globais.
-*   **Módulo de Despesas em Grupo (Social Finance):** 
-    *   Divisão de despesas entre múltiplos participantes.
-    *   **4 Estratégias de Divisão:** Uniforme, Exata, Porcentagem e Por Cotas (Shares).
-    *   **Algoritmo de Otimização:** Sugestão do número mínimo de transferências para liquidar dívidas do grupo.
-*   **Diferenciais de Usabilidade:**
-    *   **Identidade Automática:** O sistema identifica o usuário pelo Token JWT (dispensa IDs manuais em headers).
-    *   **Onboarding Fluido:** Criação automática de uma carteira padrão no cadastro do usuário.
-    *   **Listagens de Dados (Dashboards):** Endpoints completos para listar carteiras, histórico de transações e grupos vinculados ao usuário logado.
+👉 **[Arquitetura e Stack Tecnológica (ARCHITECTURE.md)](docs/ARCHITECTURE.md)**  
+Entenda como aplicamos *Hexagonal Architecture*, por que utilizamos Java 25 e detalhes sobre nossos Mappers manuais.
+
+👉 **[Roadmap e Módulos Concluídos (ROADMAP.md)](docs/roadmap.md)**  
+Acompanhe toda a nossa jornada de desenvolvimento, desde a criação do MVP até os mais avançados gráficos.
 
 ---
 
-## 🏗️ Arquitetura e Design
+## ⚙️ Como Executar Rapidamente
 
-O projeto adota a **Arquitetura Hexagonal (Ports & Adapters)** para garantir que as regras de negócio sejam independentes de frameworks e tecnologias externas.
+Quer testar localmente? É simples. Tenha o **Java 25** e o **Maven** instalados:
 
-### Estrutura de Pastas
-```text
-stratega
- ┣ src/main/java/br/com/maxsueleinstein/stratega
- ┃ ┣ domain/         # Núcleo: Entidades, Regras de Negócio e Interfaces de Repositório
- ┃ ┣ application/    # Casos de Uso, Portas (Interfaces) e DTOs
- ┃ ┣ infrastructure/ # Adaptadores: Persistência (JPA), Segurança (JWT), Mappers Manuais
- ┃ ┗ presentation/   # Controladores REST
+```bash
+# 1. Clone o repositório
+git clone https://github.com/maxeinstein-dev/Stratega.git
+cd Stratega/Stratega-Back
+
+# 2. Rode os testes unitários de garantia (opcional)
+./mvnw test
+
+# 3. Inicie o Servidor Backend (Embutido)
+./mvnw spring-boot:run
 ```
 
-### Diferenciais Técnicos
-*   **Mappers Manuais:** Controle total na conversão entre entidades JPA e objetos de domínio, sem dependência de bibliotecas como MapStruct.
-*   **Domain-Driven Design (DDD):** Modelagem rica onde o domínio protege suas próprias invariantes.
-*   **TDD (Test-Driven Development):** Cobertura extensiva de testes garantindo a precisão matemática dos cálculos financeiros.
-
----
-
-## 🛠️ Tecnologias
-
-*   **Java 25:** Versão mais recente com foco em performance e novos recursos da linguagem.
-*   **Spring Boot 4:** Framework base para a aplicação.
-*   **Spring Security + JWT:** Proteção de endpoints e gerenciamento de sessões stateless.
-*   **Spring Data JPA / Hibernate:** Abstração de banco de dados com mapeamento objeto-relacional.
-*   **H2 Database:** Banco de dados em memória para desenvolvimento e testes rápidos.
-*   **JUnit 5 & Mockito:** Conjunto completo para testes de unidade e integração.
-*   **Lombok:** Redução de boilerplate em classes de infraestrutura.
-
----
-
-## 🚀 Como Executar
-
-### Pré-requisitos
-*   **Java 25** instalado.
-*   **Maven 3.9+** instalado.
-
-### Passo a Passo
-1.  **Clonar o repositório:**
-    ```bash
-    git clone https://github.com/maxeinstein-dev/Stratega.git
-    cd Stratega
-    ```
-2.  **Executar os testes (Recomendado):**
-    ```bash
-    ./mvnw test
-    ```
-3.  **Iniciar a aplicação:**
-    ```bash
-    ./mvnw spring-boot:run
-    ```
-4.  **Acessar a Documentação:**
-    O Swagger/OpenAPI estará disponível em: `http://localhost:8081/swagger-ui/index.html`
-
----
-
-## 📈 Roadmap Concluído
-
-- [x] Arquitetura Hexagonal estabelecida.
-- [x] Sistema de Autenticação JWT e Onboarding com criação de carteira padrão.
-- [x] Endpoints de Listagem para alimentar painéis Front-End (GET Wallets, Transactions, Groups).
-- [x] Gestão de Wallets com atualização de saldo em tempo real (suporta saldo negativo).
-- [x] Transações Editáveis: Ajuste de valores, datas, categorias e transferências com dupla reversão de saldo.
-- [x] Lançamentos Recorrentes e Parcelamentos: Criação de múltiplas transações futuras.
-- [x] Transferências entre carteiras com transações vinculadas.
-- [x] Módulo de Despesas em Grupo com 4 tipos de split e tracking de datas e permissões de acesso.
-- [x] Algoritmo de liquidação de dívidas (Suggested Transfers).
-- [x] Dashboard Analítico: Resumo mensal de receitas, despesas e gastos agrupados por categoria.
-- [x] Metas Financeiras (Budgets): Definição de limite mensal por categoria com cálculo de % de consumo e flag `isOverBudget`.
-- [x] Exportação de Transações em CSV e Importação de Arquivos OFX e CSV.
-- [x] Exclusão de Transações com Reconciliação Automática de Saldo.
-- [x] Refatoração de Transferências para Agregado Único com Exclusão Atômica.
-- [x] Liquidação de Grupo com Injeção de Saldo em Carteiras Reais.
-- [x] Soft Delete de Carteiras e Proteção de Categorias Globais.
-- [x] Tratamento de Erros Padronizados Globais (400, 403, 404).
-- [x] Suporte a Docker e Banco de Dados PostgreSQL (Ambiente de Produção).
-- [x] Cobertura de testes superior a 90% nas regras críticas.
+Acesse o **Swagger** para testar as rotas em: `http://localhost:8081/swagger-ui/index.html`
 
 ---
 
 ## 👨‍💻 Autor
 
-**Maxsuel Einstein** - Engenheiro de Software focado em soluções backend robustas.
-
-[LinkedIn](https://www.linkedin.com/in/maxsueleinstein/) | [GitHub](https://github.com/maxeinstein-dev)
-
----
-
-## 📄 Licença
-Este projeto é para fins de estudo e demonstração técnica.
+Feito com dedicação arquitetural por **Maxsuel Einstein** - Engenheiro de Software.  
+Conecte-se comigo: [LinkedIn](https://www.linkedin.com/in/maxsueleinstein/) | [GitHub](https://github.com/maxeinstein-dev)

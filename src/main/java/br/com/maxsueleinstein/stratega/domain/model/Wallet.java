@@ -16,12 +16,17 @@ public class Wallet {
     private final UUID userId;
     private final Currency currency;
     private boolean active;
+    private boolean allowNegativeBalance;
 
     public Wallet(UUID id, String name, BigDecimal initialBalance, UUID userId) {
-        this(id, name, initialBalance, userId, Currency.BRL, true);
+        this(id, name, initialBalance, userId, Currency.BRL, true, true);
     }
 
     public Wallet(UUID id, String name, BigDecimal initialBalance, UUID userId, Currency currency, boolean active) {
+        this(id, name, initialBalance, userId, currency, active, true);
+    }
+
+    public Wallet(UUID id, String name, BigDecimal initialBalance, UUID userId, Currency currency, boolean active, boolean allowNegativeBalance) {
         validateName(name);
         if (userId == null) {
             throw new IllegalArgumentException("O usuário dono da carteira é obrigatório");
@@ -33,6 +38,7 @@ public class Wallet {
         this.userId = userId;
         this.currency = currency != null ? currency : Currency.BRL;
         this.active = active;
+        this.allowNegativeBalance = allowNegativeBalance;
     }
 
     public void updateName(String name) {
@@ -56,6 +62,31 @@ public class Wallet {
 
     public void archive() {
         this.active = false;
+    }
+
+    /**
+     * Retorna true se a operação de remoção causaria saldo negativo.
+     * Usado pelos UseCases para detectar overdraft antes de executar.
+     */
+    public boolean wouldGoNegative(BigDecimal amount) {
+        if (amount == null) return false;
+        return this.balance.subtract(amount).compareTo(BigDecimal.ZERO) < 0;
+    }
+
+    /**
+     * Converte a carteira para modo overdraft (permite saldo negativo).
+     * Chamado automaticamente pelos UseCases quando uma operação causaria overdraft
+     * em uma carteira com allowNegativeBalance = false.
+     */
+    public void enableOverdraft() {
+        this.allowNegativeBalance = true;
+    }
+
+    /**
+     * Permite alterar a política de saldo negativo da carteira.
+     */
+    public void setAllowNegativeBalance(boolean allowNegativeBalance) {
+        this.allowNegativeBalance = allowNegativeBalance;
     }
 
     public boolean isActive() {
@@ -86,6 +117,10 @@ public class Wallet {
 
     public Currency getCurrency() {
         return currency;
+    }
+
+    public boolean isAllowNegativeBalance() {
+        return allowNegativeBalance;
     }
 
     @Override

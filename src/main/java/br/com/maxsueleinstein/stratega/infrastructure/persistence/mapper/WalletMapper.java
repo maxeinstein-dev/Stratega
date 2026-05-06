@@ -12,7 +12,7 @@ public class WalletMapper {
             ? Currency.valueOf(entity.getCurrency()) 
             : Currency.BRL;
             
-        return new Wallet(entity.getId(), entity.getName(), entity.getBalance(), entity.getUserId(), currency, entity.isActive());
+        return new Wallet(entity.getId(), entity.getName(), entity.getBalance(), entity.getUserId(), currency, entity.isActive(), entity.isAllowNegativeBalance());
     }
 
     public static WalletEntity toEntity(Wallet domain) {
@@ -24,6 +24,7 @@ public class WalletMapper {
                 .userId(domain.getUserId())
                 .currency(domain.getCurrency().name())
                 .active(domain.isActive())
+                .allowNegativeBalance(domain.isAllowNegativeBalance())
                 .build();
     }
 }
