@@ -6,7 +6,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.x-brightgreen?style=for-the-badge&logo=spring)](#)
 [![JWT](https://img.shields.io/badge/Secured_with-JWT-blue?style=for-the-badge)](#)
 [![Hexagonal](https://img.shields.io/badge/Architecture-Hexagonal-blueviolet?style=for-the-badge)](#)
-[![License](https://img.shields.io/badge/License-MIT-gray?style=for-the-badge)](#)
+[![License](https://img.shields.io/badge/License-MIT-black?style=for-the-badge)](#)
 
 *Assuma o controle total do seu patrimônio com uma API moderna, testável e pronta para produção.*
 
