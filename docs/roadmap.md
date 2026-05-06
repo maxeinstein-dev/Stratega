@@ -84,12 +84,22 @@ Foco em garantir a precisão matemática absoluta e facilitar acertos de contas.
 - **Estabilização de Grupos:** Implementação de endpoints de detalhes (`GET`) e exclusão (`DELETE`) com validação de posse.
 - **Robustez na Importação:** Correção de headers para suporte total a envios via `FormData` (OFX/CSV).
 
-### Módulo 7: Globalização e Engajamento ✅
+---
+
+## 🌍 Módulo 7 - Globalização e Engajamento (Concluído)
+
+Expansão internacional e interação contínua com o usuário.
+
 - **Globalização (Multi-Moedas):** Suporte a carteiras em USD/EUR com conversão automática via ExchangeRate-API.
 - **Notificações Inteligentes:** Sistema de alertas in-app para orçamentos atingidos.
 - **Relatórios Avançados:** Gráficos de tendência e comparativos mensais.
 
-### Módulo 8: Analítica Visual e Objetivos de Poupança ✅
+---
+
+## 📊 Módulo 8 - Analítica Visual e Objetivos de Poupança (Concluído)
+
+Painéis avançados de controle de patrimônio e visão de longo prazo.
+
 - **Dashboards Históricos:** Novo endpoint `/api/dashboard/historical` com suporte a agrupamento flexível (30, 90, 180, 365 dias) retornando evolução de Receitas, Despesas e Poupança Mensal.
 - **Módulo de Objetivos de Poupança (`SavingsGoal`):** Domínio completo isolado de orçamentos (Budgets), focado em metas de economia a longo prazo com tracking de valor depositado e percentual de progresso.
 
