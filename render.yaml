@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: stratega-api
+    name: stratega
     runtime: docker
     plan: free
     dockerfilePath: ./Dockerfile
@@ -26,3 +26,5 @@ services:
         generateValue: true
       - key: JWT_EXPIRATION
         value: "86400000"
+      - key: CORS_ALLOWED_ORIGIN
+        value: https://stratega.maxsueleinstein.dev

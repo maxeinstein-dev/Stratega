@@ -48,6 +48,9 @@ Entenda como aplicamos *Hexagonal Architecture*, por que utilizamos Java 25 e de
 👉 **[Roadmap e Módulos Concluídos (ROADMAP.md)](docs/roadmap.md)**  
 Acompanhe toda a nossa jornada de desenvolvimento, desde a criação do MVP até os mais avançados gráficos.
 
+👉 **[Demo Guide (DEMO_GUIDE.md)](docs/DEMO_GUIDE.md)**
+Roteiro para testar a API publicada via Swagger, incluindo cadastro, login, carteiras, categorias, transações e checklist de ambiente.
+
 ---
 
 ## ⚙️ Como Executar Rapidamente
