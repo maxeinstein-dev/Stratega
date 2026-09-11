@@ -182,6 +182,26 @@ public class UseCaseConfig {
     }
 
     @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.GetHistoricalSummaryUseCase getHistoricalSummaryUseCase(TransactionRepository transactionRepository, WalletRepository walletRepository, br.com.maxsueleinstein.stratega.domain.service.ExchangeRateService exchangeRateService) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.GetHistoricalSummaryUseCaseImpl(transactionRepository, walletRepository, exchangeRateService);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.CreateSavingsGoalUseCase createSavingsGoalUseCase(br.com.maxsueleinstein.stratega.domain.repository.SavingsGoalRepository savingsGoalRepository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.CreateSavingsGoalUseCaseImpl(savingsGoalRepository);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.ListSavingsGoalsUseCase listSavingsGoalsUseCase(br.com.maxsueleinstein.stratega.domain.repository.SavingsGoalRepository savingsGoalRepository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.ListSavingsGoalsUseCaseImpl(savingsGoalRepository);
+    }
+
+    @Bean
+    public br.com.maxsueleinstein.stratega.application.usecase.AddFundsToGoalUseCase addFundsToGoalUseCase(br.com.maxsueleinstein.stratega.domain.repository.SavingsGoalRepository savingsGoalRepository) {
+        return new br.com.maxsueleinstein.stratega.application.usecase.impl.AddFundsToGoalUseCaseImpl(savingsGoalRepository);
+    }
+
+    @Bean
     public br.com.maxsueleinstein.stratega.application.usecase.DeleteGroupUseCase deleteGroupUseCase(br.com.maxsueleinstein.stratega.domain.repository.ExpenseGroupRepository repository) {
         return new br.com.maxsueleinstein.stratega.application.usecase.impl.DeleteGroupUseCaseImpl(repository);
     }

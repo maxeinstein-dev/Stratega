@@ -32,6 +32,7 @@ services:
       - DB_NAME=stratega
       - DB_USER=postgres
       - DB_PASSWORD=postgres
+      - PORT=8080
       - JWT_SECRET=U29tZVN1cGVyU2VjcmV0S2V5Rm9yU3RyYXRlZ2FBcHBsaWNhdGlvblByb2R1Y3Rpb24=
       - JWT_EXPIRATION=86400000
     depends_on:
