@@ -15,7 +15,7 @@ The Swagger UI is protected with HTTP Basic Auth:
 - Username: `swagger`
 - Password: use the `SWAGGER_PASSWORD` value configured in Render.
 
-Application endpoints use JWT Bearer authentication. Create a user, log in, and use the returned token in Swagger's `Authorize` modal.
+The published demo can run with `DEMO_AUTH_ENABLED=true`. In that mode, API endpoints automatically use a shared demo reviewer account when no JWT is provided. JWT login still works for normal application testing.
 
 ## Demo Flow
 
@@ -49,7 +49,13 @@ Expected result:
 - `/` returns the API name, status, and Swagger path.
 - `/health` returns `status: ok`.
 
-### 3. Register a Demo User
+### 3. Use the Demo Account Automatically
+
+When `DEMO_AUTH_ENABLED=true`, skip manual JWT authorization and call the protected endpoints directly from Swagger. The API will attach a shared demo reviewer account to unauthenticated API calls.
+
+Use the login flow below only if you want to test the JWT behavior explicitly.
+
+### 4. Register a Demo User
 
 Call:
 
@@ -69,7 +75,7 @@ Example body:
 
 If the email already exists, change it to another address such as `demo.reviewer+2@example.com`.
 
-### 4. Log In
+### 5. Log In
 
 Call:
 
@@ -92,7 +98,7 @@ Copy the returned token. In Swagger, click `Authorize` and enter:
 Bearer <token>
 ```
 
-### 5. Create a Wallet
+### 6. Create a Wallet
 
 Call:
 
@@ -114,7 +120,7 @@ Example body:
 
 Copy the returned wallet `id`.
 
-### 6. Create a Category
+### 7. Create a Category
 
 Call:
 
@@ -134,7 +140,7 @@ Example body:
 
 Copy the returned category `id`.
 
-### 7. Create a Transaction
+### 8. Create a Transaction
 
 Call:
 
@@ -201,6 +207,8 @@ JWT_SECRET=<strong generated secret>
 JWT_EXPIRATION=86400000
 SWAGGER_PASSWORD=<private Swagger password>
 CORS_ALLOWED_ORIGIN=https://stratega.maxsueleinstein.dev
+DEMO_AUTH_ENABLED=true
+DEMO_USER_EMAIL=demo.reviewer@stratega.dev
 ```
 
 Use Render Postgres internal connection details for the database variables. Do not use a fixed IP address.

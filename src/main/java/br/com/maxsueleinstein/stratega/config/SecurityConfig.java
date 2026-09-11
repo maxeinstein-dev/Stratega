@@ -10,6 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import br.com.maxsueleinstein.stratega.infrastructure.security.DemoAuthenticationFilter;
 import br.com.maxsueleinstein.stratega.infrastructure.security.JwtAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final DemoAuthenticationFilter demoAuthenticationFilter;
 
     @Value("${cors.allowed.origin:http://localhost:5173}")
     private String corsAllowedOrigin;
@@ -26,8 +28,9 @@ public class SecurityConfig {
     @Value("${swagger.password:admin}")
     private String swaggerPassword;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, DemoAuthenticationFilter demoAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.demoAuthenticationFilter = demoAuthenticationFilter;
     }
 
     @Bean
@@ -65,7 +68,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(demoAuthenticationFilter, JwtAuthenticationFilter.class);
  
         return http.build();
     }
