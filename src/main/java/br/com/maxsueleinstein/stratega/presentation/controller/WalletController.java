@@ -9,6 +9,8 @@ import br.com.maxsueleinstein.stratega.application.usecase.FindWalletsByUserIdUs
 import br.com.maxsueleinstein.stratega.application.usecase.UpdateWalletUseCase;
 import br.com.maxsueleinstein.stratega.domain.model.User;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/wallets")
-@Tag(name = "Wallets", description = "Endpoints para gerenciamento de carteiras")
+@Tag(name = "Wallets", description = "Wallet management endpoints.")
 public class WalletController {
 
     private final CreateWalletUseCase createWalletUseCase;
@@ -39,12 +41,29 @@ public class WalletController {
     }
 
     @PostMapping
-    @Operation(summary = "Criar nova carteira para o usuário autenticado")
+    @Operation(summary = "Create a wallet for the authenticated user")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(
+                            name = "Create a main wallet",
+                            value = """
+                                    {
+                                      "name": "Main Wallet",
+                                      "initialBalance": 2500.00,
+                                      "userId": null,
+                                      "currency": "BRL",
+                                      "allowNegativeBalance": false
+                                    }
+                                    """
+                    )
+            )
+    )
     public ResponseEntity<WalletResponse> createWallet(
             @AuthenticationPrincipal User user,
             @RequestBody CreateWalletRequest request) {
         
-        // Garante que a carteira seja criada para o usuário logado
+        // Always bind the wallet to the authenticated user.
         CreateWalletRequest authenticatedRequest = new CreateWalletRequest(
                 request.name(), 
                 request.initialBalance(), 
@@ -58,14 +77,14 @@ public class WalletController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar todas as carteiras do usuário autenticado")
+    @Operation(summary = "List the authenticated user's wallets")
     public ResponseEntity<List<WalletResponse>> getWallets(@AuthenticationPrincipal User user) {
         List<WalletResponse> wallets = findWalletsByUserIdUseCase.execute(user.getId());
         return ResponseEntity.ok(wallets);
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualizar dados de uma carteira")
+    @Operation(summary = "Update a wallet")
     public ResponseEntity<WalletResponse> updateWallet(
             @PathVariable UUID id,
             @AuthenticationPrincipal User user,
@@ -75,7 +94,7 @@ public class WalletController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Excluir uma carteira (Soft Delete se houver transações)")
+    @Operation(summary = "Delete a wallet")
     public ResponseEntity<Void> deleteWallet(
             @PathVariable UUID id,
             @AuthenticationPrincipal User user) {

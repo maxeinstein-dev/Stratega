@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/groups")
-@Tag(name = "Groups", description = "Endpoints para gerenciamento de grupos de despesas")
+@Tag(name = "Groups", description = "Shared expense group endpoints.")
 public class GroupController {
 
     private final CreateGroupUseCase createGroupUseCase;
@@ -46,7 +46,7 @@ public class GroupController {
     }
 
     @GetMapping("/{groupId}/movements")
-    @Operation(summary = "Obter histórico de movimentações (despesas e acertos) do grupo")
+    @Operation(summary = "List a group's expense and settlement movements")
     public ResponseEntity<List<GroupMovementResponse>> getGroupMovements(
             @PathVariable UUID groupId,
             @AuthenticationPrincipal User user) {
@@ -55,7 +55,7 @@ public class GroupController {
     }
  
     @PostMapping
-    @Operation(summary = "Criar novo grupo de despesas")
+    @Operation(summary = "Create a shared expense group")
     public ResponseEntity<GroupResponse> create(
             @AuthenticationPrincipal User user,
             @RequestBody CreateGroupRequest request) {
@@ -71,14 +71,14 @@ public class GroupController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar grupos do usuário autenticado")
+    @Operation(summary = "List the authenticated user's groups")
     public ResponseEntity<List<GroupResponse>> getGroups(@AuthenticationPrincipal User user) {
         List<GroupResponse> groups = findGroupsByUserIdUseCase.execute(user.getId());
         return ResponseEntity.ok(groups);
     }
 
     @GetMapping("/{groupId}")
-    @Operation(summary = "Obter detalhes de um grupo específico")
+    @Operation(summary = "Get group details")
     public ResponseEntity<GroupResponse> getGroupById(
             @PathVariable UUID groupId,
             @AuthenticationPrincipal User user) {
@@ -87,7 +87,7 @@ public class GroupController {
     }
  
     @PostMapping("/{groupId}/expenses")
-    @Operation(summary = "Adicionar despesa ao grupo")
+    @Operation(summary = "Add an expense to a group")
     public ResponseEntity<GroupResponse> addExpense(
             @PathVariable UUID groupId, 
             @AuthenticationPrincipal User user,
@@ -109,7 +109,7 @@ public class GroupController {
     }
  
     @GetMapping("/{groupId}/balances")
-    @Operation(summary = "Calcular balanço e transferências sugeridas")
+    @Operation(summary = "Calculate balances and suggested transfers")
     public ResponseEntity<GroupBalancesResponse> getBalances(
             @PathVariable UUID groupId,
             @AuthenticationPrincipal User user) {
@@ -117,7 +117,7 @@ public class GroupController {
     }
 
     @PostMapping("/{groupId}/settle")
-    @Operation(summary = "Liquidar dívida e registrar entrada em carteira")
+    @Operation(summary = "Settle a group debt and register the wallet entry")
     public ResponseEntity<Void> settleDebt(
             @PathVariable UUID groupId, 
             @AuthenticationPrincipal User user,
@@ -128,7 +128,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/{groupId}")
-    @Operation(summary = "Excluir um grupo de despesas")
+    @Operation(summary = "Delete a group")
     public ResponseEntity<Void> delete(
             @PathVariable UUID groupId,
             @AuthenticationPrincipal User user) {

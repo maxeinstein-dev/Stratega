@@ -9,6 +9,8 @@ import br.com.maxsueleinstein.stratega.application.usecase.FindCategoriesByUserI
 import br.com.maxsueleinstein.stratega.application.usecase.UpdateCategoryUseCase;
 import br.com.maxsueleinstein.stratega.domain.model.User;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/categories")
-@Tag(name = "Categories", description = "Endpoints para gerenciamento de categorias de transações")
+@Tag(name = "Categories", description = "Transaction category management endpoints.")
 public class CategoryController {
 
     private final CreateCategoryUseCase createCategoryUseCase;
@@ -39,12 +41,27 @@ public class CategoryController {
     }
 
     @PostMapping
-    @Operation(summary = "Criar nova categoria customizada")
+    @Operation(summary = "Create a custom transaction category")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(
+                            name = "Create an income category",
+                            value = """
+                                    {
+                                      "name": "Freelance",
+                                      "type": "INCOME",
+                                      "userId": null
+                                    }
+                                    """
+                    )
+            )
+    )
     public ResponseEntity<CategoryResponse> createCategory(
             @AuthenticationPrincipal User user,
             @RequestBody CreateCategoryRequest request) {
         
-        // Garante que a categoria seja criada para o usuário logado
+        // Always bind the category to the authenticated user.
         CreateCategoryRequest authenticatedRequest = new CreateCategoryRequest(
                 request.name(), 
                 request.type(), 
@@ -56,14 +73,14 @@ public class CategoryController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar categorias acessíveis ao usuário (Globais + Customizadas)")
+    @Operation(summary = "List categories available to the authenticated user")
     public ResponseEntity<List<CategoryResponse>> getCategories(@AuthenticationPrincipal User user) {
         List<CategoryResponse> categories = findCategoriesByUserIdUseCase.execute(user.getId());
         return ResponseEntity.ok(categories);
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualizar nome ou tipo de uma categoria customizada")
+    @Operation(summary = "Update a custom category")
     public ResponseEntity<CategoryResponse> updateCategory(
             @PathVariable UUID id,
             @AuthenticationPrincipal User user,
@@ -73,7 +90,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Excluir uma categoria customizada (Bloqueado se estiver em uso)")
+    @Operation(summary = "Delete a custom category")
     public ResponseEntity<Void> deleteCategory(
             @PathVariable UUID id,
             @AuthenticationPrincipal User user) {

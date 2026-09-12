@@ -7,6 +7,8 @@ import br.com.maxsueleinstein.stratega.application.dto.UpdateTransactionRequest;
 import br.com.maxsueleinstein.stratega.application.usecase.*;
 import br.com.maxsueleinstein.stratega.domain.model.User;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,7 +25,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/transactions")
-@Tag(name = "Transactions", description = "Endpoints para gerenciamento de movimentações financeiras")
+@Tag(name = "Transactions", description = "Income, expense, transfer, import, and export endpoints.")
 public class TransactionController {
 
     private final CreateTransactionUseCase createTransactionUseCase;
@@ -48,7 +50,27 @@ public class TransactionController {
     }
 
     @PostMapping
-    @Operation(summary = "Criar nova transação (Receita ou Despesa)")
+    @Operation(summary = "Create an income or expense transaction")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(
+                            name = "Create an income transaction",
+                            value = """
+                                    {
+                                      "description": "International client payment",
+                                      "amount": 1200.00,
+                                      "date": "2026-09-11T12:00:00",
+                                      "type": "INCOME",
+                                      "walletId": "<wallet-id>",
+                                      "categoryId": "<category-id>",
+                                      "installments": null,
+                                      "recurringMonths": null
+                                    }
+                                    """
+                    )
+            )
+    )
     public ResponseEntity<List<TransactionResponse>> createTransaction(
             @AuthenticationPrincipal User user,
             @RequestBody CreateTransactionRequest request) {
@@ -57,7 +79,7 @@ public class TransactionController {
     }
 
     @PostMapping("/transfer")
-    @Operation(summary = "Realizar transferência entre carteiras")
+    @Operation(summary = "Transfer funds between wallets")
     public ResponseEntity<Void> transferFunds(
             @AuthenticationPrincipal User user,
             @RequestBody TransferFundsRequest request) {
@@ -66,7 +88,7 @@ public class TransactionController {
     }
 
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Importar extrato bancário (OFX ou CSV)")
+    @Operation(summary = "Import a bank statement file")
     public ResponseEntity<Map<String, Object>> importTransactions(
             @AuthenticationPrincipal User user,
             @RequestParam("file") MultipartFile file,
@@ -82,7 +104,7 @@ public class TransactionController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar transações do usuário com filtros opcionais")
+    @Operation(summary = "List transactions with optional month and year filters")
     public ResponseEntity<List<TransactionResponse>> getTransactions(
             @AuthenticationPrincipal User user,
             @RequestParam(required = false) Integer month,
@@ -93,7 +115,7 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Editar uma transação existente")
+    @Operation(summary = "Update a transaction")
     public ResponseEntity<TransactionResponse> updateTransaction(
             @PathVariable UUID id,
             @AuthenticationPrincipal User user,
@@ -103,7 +125,7 @@ public class TransactionController {
     }
 
     @GetMapping("/export")
-    @Operation(summary = "Exportar transações do usuário para CSV")
+    @Operation(summary = "Export transactions to CSV")
     public ResponseEntity<String> exportTransactions(
             @AuthenticationPrincipal User user,
             @RequestParam(required = false) Integer month,
@@ -130,7 +152,7 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Excluir uma transação e reverter impacto no saldo")
+    @Operation(summary = "Delete a transaction and reverse its wallet balance impact")
     public ResponseEntity<Void> deleteTransaction(
             @PathVariable UUID id,
             @AuthenticationPrincipal User user) {

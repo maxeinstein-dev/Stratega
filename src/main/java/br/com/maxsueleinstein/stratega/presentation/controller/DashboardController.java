@@ -21,7 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/dashboard")
-@Tag(name = "Dashboard", description = "Endpoints para resumos e relatórios financeiros")
+@Tag(name = "Dashboard", description = "Financial summaries and reporting endpoints.")
 public class DashboardController {
 
     private final GetDashboardSummaryUseCase getDashboardSummaryUseCase;
@@ -40,7 +40,7 @@ public class DashboardController {
     }
 
     @GetMapping("/summary")
-    @Operation(summary = "Resumo consolidado (Entradas, Saídas, Saldo)")
+    @Operation(summary = "Get the consolidated income, expense, and balance summary")
     public ResponseEntity<DashboardSummaryResponse> getSummary(
             @AuthenticationPrincipal User user,
             @RequestParam(required = false) Integer month,
@@ -51,7 +51,7 @@ public class DashboardController {
     }
 
     @GetMapping("/reports/trend")
-    @Operation(summary = "Relatório de tendência de gastos diários")
+    @Operation(summary = "Get the daily spending trend report")
     public ResponseEntity<SpendingTrendResponse> getSpendingTrend(
             @AuthenticationPrincipal User user,
             @RequestParam int month,
@@ -60,7 +60,7 @@ public class DashboardController {
     }
 
     @GetMapping("/reports/comparison")
-    @Operation(summary = "Comparativo de gastos por categoria (Mês atual vs anterior)")
+    @Operation(summary = "Compare spending by category against the previous month")
     public ResponseEntity<Map<String, GetCategoryComparisonUseCase.ComparisonData>> getComparison(
             @AuthenticationPrincipal User user,
             @RequestParam int month,
@@ -69,7 +69,7 @@ public class DashboardController {
     }
 
     @GetMapping("/historical")
-    @Operation(summary = "Resumo histórico de receitas, despesas e poupança")
+    @Operation(summary = "Get the historical income, expense, and savings summary")
     public ResponseEntity<HistoricalSummaryResponse> getHistorical(
             @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = "180") int days) {

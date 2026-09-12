@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/notifications")
-@Tag(name = "Notifications", description = "Endpoints para gerenciamento de notificações")
+@Tag(name = "Notifications", description = "User notification endpoints.")
 public class NotificationController {
 
     private final GetNotificationsUseCase getNotificationsUseCase;
@@ -28,13 +28,13 @@ public class NotificationController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar notificações do usuário autenticado")
+    @Operation(summary = "List the authenticated user's notifications")
     public ResponseEntity<List<NotificationResponse>> list(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(getNotificationsUseCase.execute(user.getId()));
     }
 
     @PatchMapping("/{id}/read")
-    @Operation(summary = "Marcar uma notificação como lida")
+    @Operation(summary = "Mark a notification as read")
     public ResponseEntity<Void> markAsRead(@PathVariable UUID id) {
         markNotificationAsReadUseCase.execute(id);
         return ResponseEntity.noContent().build();

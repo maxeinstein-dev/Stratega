@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/goals")
-@Tag(name = "Objetivos de Poupança", description = "Gerenciamento de metas financeiras")
+@Tag(name = "Savings Goals", description = "Savings goal management endpoints.")
 public class SavingsGoalController {
 
     private final CreateSavingsGoalUseCase createSavingsGoalUseCase;
@@ -34,7 +34,7 @@ public class SavingsGoalController {
     }
 
     @PostMapping
-    @Operation(summary = "Criar novo objetivo de poupança")
+    @Operation(summary = "Create a savings goal")
     public ResponseEntity<SavingsGoalResponse> createGoal(
             @AuthenticationPrincipal User user,
             @RequestBody CreateSavingsGoalRequest request) {
@@ -42,13 +42,13 @@ public class SavingsGoalController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar objetivos de poupança")
+    @Operation(summary = "List savings goals")
     public ResponseEntity<List<SavingsGoalResponse>> listGoals(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(listSavingsGoalsUseCase.execute(user.getId()));
     }
 
     @PostMapping("/{goalId}/add-funds")
-    @Operation(summary = "Adicionar fundos a um objetivo")
+    @Operation(summary = "Add funds to a savings goal")
     public ResponseEntity<SavingsGoalResponse> addFunds(
             @AuthenticationPrincipal User user,
             @PathVariable UUID goalId,

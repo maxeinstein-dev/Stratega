@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/budgets")
-@Tag(name = "Budgets", description = "Endpoints para gerenciamento de metas financeiras")
+@Tag(name = "Budgets", description = "Monthly spending budget endpoints.")
 public class BudgetController {
 
     private final SetBudgetUseCase setBudgetUseCase;
@@ -28,7 +28,7 @@ public class BudgetController {
     }
 
     @PostMapping
-    @Operation(summary = "Definir ou atualizar meta de gastos para uma categoria")
+    @Operation(summary = "Set or update a monthly budget for a category")
     public ResponseEntity<BudgetResponse> setBudget(
             @AuthenticationPrincipal User user,
             @RequestBody BudgetRequest request) {
@@ -37,7 +37,7 @@ public class BudgetController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar metas de gastos do mês")
+    @Operation(summary = "List monthly budgets")
     public ResponseEntity<List<BudgetResponse>> getBudgets(
             @AuthenticationPrincipal User user,
             @RequestParam int month,

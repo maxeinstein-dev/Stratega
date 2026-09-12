@@ -24,14 +24,16 @@ The published demo can run with `DEMO_AUTH_ENABLED=true`. In that mode, API endp
 Open the Swagger UI:
 
 ```text
-https://stratega-back.maxsueleinstein.dev/swagger-ui/index.html
+https://stratega-back.maxsueleinstein.dev
 ```
 
 If the custom domain is not active yet, use:
 
 ```text
-https://stratega.onrender.com/swagger-ui/index.html
+https://stratega.onrender.com
 ```
+
+The root URL redirects to `/swagger-ui/index.html`, so reviewers do not need to type the Swagger path manually.
 
 Log in with the Swagger credentials described above.
 
@@ -46,7 +48,7 @@ GET /health
 
 Expected result:
 
-- `/` returns the API name, status, and Swagger path.
+- `/` redirects to the Swagger UI.
 - `/health` returns `status: ok`.
 
 ### 3. Use the Demo Account Automatically
@@ -54,6 +56,8 @@ Expected result:
 When `DEMO_AUTH_ENABLED=true`, skip manual JWT authorization and call the protected endpoints directly from Swagger. The API will attach a shared demo reviewer account to unauthenticated API calls.
 
 Use the login flow below only if you want to test the JWT behavior explicitly.
+
+The Swagger operations include the same request examples shown in this guide. For requests that need generated IDs, create the earlier resource first and paste the returned `id` into the next example.
 
 ### 4. Register a Demo User
 
