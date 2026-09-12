@@ -17,6 +17,15 @@ The Swagger UI is protected with HTTP Basic Auth:
 
 The published demo can run with `DEMO_AUTH_ENABLED=true`. In that mode, API endpoints automatically use a shared demo reviewer account when no JWT is provided. JWT login still works for normal application testing.
 
+The front-end also includes a front-only layout review account:
+
+```text
+Email: max@teste.com
+Password: max123
+```
+
+Use it when you only need to review the deployed UI and the back-end is unavailable. That account is stored locally by the front-end and does not create server-side data.
+
 ## Demo Flow
 
 ### 1. Open the API

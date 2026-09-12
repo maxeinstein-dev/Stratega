@@ -1,6 +1,7 @@
 package br.com.maxsueleinstein.stratega.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +37,9 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Stratega API")
                         .version("1.0")
-                        .description("Financial planning API for the Stratega portfolio demo. In the published demo, protected endpoints can be tested without a JWT when demo access is enabled."));
+                        .description("Financial planning API for the Stratega portfolio demo. In the published demo, protected endpoints can be tested without a JWT when demo access is enabled. Documentation: https://github.com/maxeinstein-dev/Stratega#readme"))
+                .externalDocs(new ExternalDocumentation()
+                        .description("README and demo guide")
+                        .url("https://github.com/maxeinstein-dev/Stratega/blob/master/docs/DEMO_GUIDE.md"));
     }
 }

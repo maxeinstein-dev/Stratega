@@ -53,6 +53,25 @@ Roteiro para testar a API publicada via Swagger, incluindo cadastro, login, cart
 
 ---
 
+## 🌐 Demo Publicada
+
+- Front-end: [`https://stratega.maxsueleinstein.dev`](https://stratega.maxsueleinstein.dev)
+- Back-end / Swagger: [`https://stratega-back.maxsueleinstein.dev`](https://stratega-back.maxsueleinstein.dev)
+- Render URL atual: [`https://stratega.onrender.com`](https://stratega.onrender.com)
+
+A raiz do domínio do back-end redireciona para o Swagger UI, então avaliadores podem abrir `stratega-back.maxsueleinstein.dev` diretamente.
+
+O front-end também possui um acesso local de demonstração para revisão visual, independente da disponibilidade do back-end:
+
+```text
+Email: max@teste.com
+Senha: max123
+```
+
+Esse login demo existe somente no front-end. O fluxo real de cadastro/login continua passando pela API.
+
+---
+
 ## ⚙️ Como Executar Rapidamente
 
 Quer testar localmente? É simples. Tenha o **Java 25** e o **Maven** instalados:
@@ -69,7 +88,9 @@ cd Stratega/Stratega-Back
 ./mvnw spring-boot:run
 ```
 
-Acesse o **Swagger** para testar as rotas em: `http://localhost:8081/swagger-ui/index.html`
+Acesse o **Swagger** para testar as rotas em: `http://localhost:8081/swagger-ui/index.html`.
+
+Em produção, use `https://stratega-back.maxsueleinstein.dev`.
 
 ---
 
